@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
 import { z } from "zod";
 import type { Country } from "@/lib/countries";
 import { useCountrySearch } from "@/hooks/use-country-search";
@@ -172,10 +172,16 @@ export function CountryExplorer() {
       {errors.query && <p className="-mt-4 mb-4 text-sm text-red-700" role="alert">{errors.query.message}</p>}
 
       {isPending ? (
-        <div aria-busy="true" aria-label="Loading countries" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: PAGE_SIZE }, (_, index) => (
-            <div className="h-[264px] animate-pulse rounded-[20px] border border-stone-200 bg-white" key={index} />
-          ))}
+        <div aria-busy="true" className="space-y-5">
+          <p className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-900" role="status">
+            <LoaderCircle aria-hidden="true" className="animate-spin" size={18} />
+            Loading countries...
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: PAGE_SIZE }, (_, index) => (
+              <div className="h-[264px] animate-pulse rounded-[20px] border border-stone-200 bg-white" key={index} />
+            ))}
+          </div>
         </div>
       ) : error ? (
         <div aria-live="polite" className="rounded-2xl border border-red-200 bg-white px-6 py-10 text-center">

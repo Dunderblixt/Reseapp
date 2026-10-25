@@ -1,6 +1,6 @@
 "use client";
 
-import { CloudSun, Droplets, MapPin, RefreshCw, Wind } from "lucide-react";
+import { CloudSun, Droplets, LoaderCircle, MapPin, RefreshCw, Wind } from "lucide-react";
 import { useWeather } from "@/hooks/use-weather";
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +10,10 @@ export function WeatherPanel({ code }: { code: string }) {
   if (isPending) {
     return (
       <section aria-busy="true" aria-label="Loading current weather" className="rounded-2xl border border-stone-200 bg-white p-6">
-        <div className="h-3 w-24 animate-pulse rounded bg-stone-200" />
+        <p className="flex items-center gap-2 text-sm font-medium text-emerald-900" role="status">
+          <LoaderCircle aria-hidden="true" className="animate-spin" size={18} />
+          Loading current weather...
+        </p>
         <div className="mt-5 h-10 w-36 animate-pulse rounded bg-stone-100" />
         <div className="mt-4 h-4 w-full animate-pulse rounded bg-stone-100" />
       </section>
