@@ -1,104 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-
-const PAGE_SIZE = 12;
-const API_URL = "https://api.restcountries.com/countries/v5";
-
-type Country = {
-  names: { common: string };
-  codes: { alpha_2: string };
-  capitals?: { name: string }[];
-  flag: { emoji: string };
-  region?: string;
-  population?: number;
-};
-
-type CountryResponse = {
-  data: {
-    objects: Country[];
-    meta: {
-      count: number;
-      offset: number;
-      total: number;
-    };
-  };
-};
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isCountry(value: unknown): value is Country {
-  if (!isRecord(value)) return false;
-
-  const { names, codes, capitals, flag, region, population } = value;
-  return (
-    isRecord(names) &&
-    typeof names.common === "string" &&
-    isRecord(codes) &&
-    typeof codes.alpha_2 === "string" &&
-    isRecord(flag) &&
-    typeof flag.emoji === "string" &&
-    (capitals === undefined ||
-      (Array.isArray(capitals) &&
-        capitals.every(
-          (capital) => isRecord(capital) && typeof capital.name === "string",
-        ))) &&
-    (region === undefined || typeof region === "string") &&
-    (population === undefined || typeof population === "number")
-  );
-}
-
-function isCountryResponse(value: unknown): value is CountryResponse {
-  if (!isRecord(value) || !isRecord(value.data)) return false;
-
-  const { objects, meta } = value.data;
-  return (
-    Array.isArray(objects) &&
-    objects.every(isCountry) &&
-    isRecord(meta) &&
-    typeof meta.count === "number" &&
-    typeof meta.offset === "number" &&
-    typeof meta.total === "number"
-  );
-}
-
-async function getCountries(page: number): Promise<CountryResponse> {
-  const apiKey = process.env.REST_COUNTRIES_API_KEY;
-  if (!apiKey) {
-    throw new Error("REST_COUNTRIES_API_KEY is not configured on the server.");
-  }
-
-  const url = new URL(API_URL);
-  url.searchParams.set(
-    "response_fields",
-    "names.common,codes.alpha_2,capitals,flag.emoji,region,population",
-  );
-  url.searchParams.set("limit", String(PAGE_SIZE));
-  url.searchParams.set("offset", String((page - 1) * PAGE_SIZE));
-
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-    next: { revalidate: 14_400 },
-  });
-
-  if (!response.ok) {
-    throw new Error(`REST Countries API returned status ${response.status}.`);
-  }
-
-  const result: unknown = await response.json();
-  if (!isCountryResponse(result)) {
-    throw new Error("REST Countries API returned an unexpected response.");
-  }
-
-  return result;
-}
+import { COUNTRY_PAGE_SIZE, getCountries } from "@/lib/countries";
 
 function getPageNumber(value: string | string[] | undefined): number {
   const pageValue = Array.isArray(value) ? value[0] : value;
   const page = Number(pageValue);
-  const maxPage = Math.floor(Number.MAX_SAFE_INTEGER / PAGE_SIZE);
+  const maxPage = Math.floor(Number.MAX_SAFE_INTEGER / COUNTRY_PAGE_SIZE);
 
   return Number.isSafeInteger(page) && page > 0 && page <= maxPage ? page : 1;
 }
@@ -117,7 +25,7 @@ async function CountryExplorer({
   const { page: pageParam } = await searchParams;
   const page = getPageNumber(pageParam);
 
-  let result: CountryResponse;
+  let result: Awaited<ReturnType<typeof getCountries>>;
   try {
     result = await getCountries(page);
   } catch (error) {
@@ -139,7 +47,7 @@ async function CountryExplorer({
   }
 
   const { objects: countries, meta } = result.data;
-  const totalPages = Math.ceil(meta.total / PAGE_SIZE);
+  const totalPages = Math.ceil(meta.total / COUNTRY_PAGE_SIZE);
 
   if (totalPages > 0 && page > totalPages) {
     redirect(`/?page=${totalPages}`);
@@ -166,27 +74,30 @@ async function CountryExplorer({
             const capital = country.capitals?.[0]?.name;
 
             return (
-              <li
-                className="country-card"
-                key={country.codes.alpha_2 || country.names.common}
-              >
-                <span className="country-flag" aria-hidden="true">
-                  {country.flag.emoji || "🌍"}
-                </span>
-                <div className="country-info">
-                  <h3>{country.names.common}</h3>
-                  <p>
-                    {[capital, country.region]
-                      .filter(Boolean)
-                      .join(" · ") || "Discover this destination"}
-                  </p>
-                  <span className="country-population">
-                    {formatPopulation(country.population)}
+              <li key={country.uuid}>
+                <Link
+                  className="country-card"
+                  href={`/countries/${country.uuid}`}
+                  aria-label={`View more about ${country.names.common}`}
+                >
+                  <span className="country-flag" aria-hidden="true">
+                    {country.flag.emoji || "🌍"}
                   </span>
-                </div>
-                <span className="country-code">
-                  {country.codes.alpha_2 || "—"}
-                </span>
+                  <div className="country-info">
+                    <h3>{country.names.common}</h3>
+                    <p>
+                      {[capital, country.region]
+                        .filter(Boolean)
+                        .join(" · ") || "Discover this destination"}
+                    </p>
+                    <span className="country-population">
+                      {formatPopulation(country.population)}
+                    </span>
+                  </div>
+                  <span className="country-code">
+                    {country.codes.alpha_2 || "—"}
+                  </span>
+                </Link>
               </li>
             );
           })}
