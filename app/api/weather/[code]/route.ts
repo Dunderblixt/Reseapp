@@ -39,15 +39,30 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
-  const country = await getCountry(code);
+  let country: Awaited<ReturnType<typeof getCountry>>;
+  try {
+    country = await getCountry(code);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Could not load country data from REST Countries.";
+    console.error("Could not load country data for the weather request.", error);
+    return NextResponse.json({ error: message }, { status: 502 });
+  }
 
   if (!country) {
     return NextResponse.json({ error: "Country not found." }, { status: 404 });
   }
 
-  const coordinates = country.capitalInfo?.latlng ?? country.latlng;
+  const coordinates = country.capitalInfo?.latlng;
   if (!coordinates || coordinates.length < 2) {
-    return NextResponse.json({ error: "Coordinates are unavailable for this country." }, { status: 422 });
+    return NextResponse.json(
+      {
+        error: `Weather is unavailable because REST Countries has no coordinates for the capital of ${country.name.common}.`,
+      },
+      { status: 422 },
+    );
   }
 
   const [latitude, longitude] = coordinates;

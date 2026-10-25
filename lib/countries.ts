@@ -48,6 +48,37 @@ interface RestCountriesResponse {
   errors?: { message?: string }[];
 }
 
+function getRestCountriesErrorMessage(
+  status: number,
+  apiMessage?: string,
+): string {
+  const details = apiMessage?.toLocaleLowerCase("en") ?? "";
+
+  if (
+    status === 401 ||
+    /invalid (api )?key|api key.*invalid|unauthori[sz]ed/.test(details)
+  ) {
+    return "The REST Countries API key is invalid or unauthorized. Check REST_COUNTRIES_API_KEY.";
+  }
+
+  if (status === 429) {
+    return "The REST Countries API is receiving too many requests. Wait a moment before trying again.";
+  }
+
+  if (
+    status === 403 &&
+    /quota|monthly|request limit|frozen|usage limit/.test(details)
+  ) {
+    return "The REST Countries monthly request quota has been exceeded. Check your API usage or upgrade your plan.";
+  }
+
+  if (status === 403) {
+    return "The REST Countries API denied access. The monthly quota may be exhausted, or the API key account may be disabled. Check your API usage and account status.";
+  }
+
+  return apiMessage ?? `Could not fetch countries (HTTP ${status}).`;
+}
+
 function getApiKey() {
   const apiKey = process.env.REST_COUNTRIES_API_KEY;
   if (!apiKey) {
@@ -68,11 +99,23 @@ async function fetchCountryPage(apiKey: string, offset: number) {
     next: { revalidate: 86400 },
   });
 
-  const result = (await response.json()) as RestCountriesResponse;
+  const responseBody = await response.text();
+  let result: RestCountriesResponse;
+  try {
+    result = JSON.parse(responseBody) as RestCountriesResponse;
+  } catch {
+    if (!response.ok) {
+      throw new Error(getRestCountriesErrorMessage(response.status));
+    }
+    throw new Error("Rest Countries returned an invalid response.");
+  }
+
   if (!response.ok) {
     throw new Error(
-      result.errors?.[0]?.message ??
-        `Could not fetch countries (HTTP ${response.status}).`,
+      getRestCountriesErrorMessage(
+        response.status,
+        result.errors?.[0]?.message,
+      ),
     );
   }
 
