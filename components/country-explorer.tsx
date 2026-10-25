@@ -17,6 +17,7 @@ const searchSchema = z.object({
 type SearchValues = z.infer<typeof searchSchema>;
 
 const PAGE_SIZE = 9;
+const ALL_REGIONS = "Alla regioner";
 
 async function fetchCountries(): Promise<Country[]> {
   const response = await fetch("/api/countries");
@@ -28,8 +29,9 @@ async function fetchCountries(): Promise<Country[]> {
 }
 
 export function CountryExplorer() {
-  const [region, setRegion] = useState("Alla regioner");
+  const [region, setRegion] = useState(ALL_REGIONS);
   const [page, setPage] = useState(1);
+  const [urlReady, setUrlReady] = useState(false);
   const {
     data: countries = [],
     error,
@@ -44,6 +46,7 @@ export function CountryExplorer() {
   const {
     register,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<SearchValues>({
     resolver: zodResolver(searchSchema),
@@ -55,13 +58,59 @@ export function CountryExplorer() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageCountries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const regions = [
-    "Alla regioner",
+    ALL_REGIONS,
     ...Array.from(new Set(countries.map((country) => country.region)))
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b, "sv")),
   ];
 
-  useEffect(() => setPage(1), [query, region]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialPage = Number(params.get("page"));
+
+    setValue("query", params.get("q") ?? "", { shouldValidate: true });
+    setRegion(params.get("region") || ALL_REGIONS);
+    setPage(
+      Number.isSafeInteger(initialPage) && initialPage > 0 ? initialPage : 1,
+    );
+    setUrlReady(true);
+  }, [setValue]);
+
+  useEffect(() => {
+    if (!urlReady) return;
+
+    const params = new URLSearchParams(window.location.search);
+    params.delete("q");
+    params.delete("region");
+    params.delete("page");
+
+    if (query) params.set("q", query);
+    if (region !== ALL_REGIONS) params.set("region", region);
+    if (page > 1) params.set("page", String(page));
+
+    const search = params.toString();
+    const nextUrl = `${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState(window.history.state, "", nextUrl);
+    }
+  }, [page, query, region, urlReady]);
+
+  useEffect(() => {
+    if (!urlReady || isPending || error) return;
+
+    if (
+      region !== ALL_REGIONS &&
+      !countries.some((country) => country.region === region)
+    ) {
+      setRegion(ALL_REGIONS);
+      setPage(1);
+      return;
+    }
+
+    if (page > pageCount) setPage(pageCount);
+  }, [countries, error, isPending, page, pageCount, region, urlReady]);
 
   return (
     <section aria-labelledby="country-list-title" className="mx-auto max-w-7xl px-5 pb-20 pt-14 sm:px-8 sm:pt-[72px]">
@@ -93,7 +142,7 @@ export function CountryExplorer() {
           <span className="sr-only">Sök land eller huvudstad</span>
           <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
           <input
-            {...register("query")}
+            {...register("query", { onChange: () => setPage(1) })}
             className="h-12 w-full rounded-xl border border-transparent bg-stone-50 pl-11 pr-4 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10"
             placeholder="Sök på land eller huvudstad..."
             type="search"
@@ -105,7 +154,10 @@ export function CountryExplorer() {
           <select
             className="h-12 w-full appearance-none rounded-xl border border-transparent bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 sm:min-w-[190px]"
             id="region-filter"
-            onChange={(event) => setRegion(event.target.value)}
+            onChange={(event) => {
+              setRegion(event.target.value);
+              setPage(1);
+            }}
             value={region}
           >
             {regions.map((item) => <option key={item} value={item}>{item}</option>)}
