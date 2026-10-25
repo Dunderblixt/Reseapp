@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nordresa",
-  description: "Discover your next destination with Nordresa.",
+  title: "Explore countries | Nordresa",
+  description: "Discover countries around the world with Nordresa.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
