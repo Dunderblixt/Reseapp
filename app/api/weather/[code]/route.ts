@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCountry } from "@/lib/countries";
+import {
+  fetchOpenMeteoCurrentWeather,
+  type OpenMeteoCurrentWeather,
+} from "@/lib/open-meteo";
 
 export const dynamic = "force-dynamic";
 
@@ -66,45 +70,21 @@ export async function GET(
   }
 
   const [latitude, longitude] = coordinates;
-  const weatherUrl = new URL("https://api.open-meteo.com/v1/forecast");
-  weatherUrl.searchParams.set("latitude", String(latitude));
-  weatherUrl.searchParams.set("longitude", String(longitude));
-  weatherUrl.searchParams.set("current", "temperature_2m,weather_code");
-
-  let response: Response;
+  let currentWeather: OpenMeteoCurrentWeather;
   try {
-    response = await fetch(weatherUrl, { cache: "no-store" });
-  } catch {
-    return NextResponse.json({ error: "The weather service is currently unreachable." }, { status: 502 });
-  }
-
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "Could not fetch the weather right now." },
-      { status: response.status === 404 ? 404 : 502 },
-    );
-  }
-
-  let weather: { current?: { temperature_2m?: number; weather_code?: number } };
-  try {
-    weather = (await response.json()) as {
-      current?: { temperature_2m?: number; weather_code?: number };
-    };
-  } catch {
-    return NextResponse.json(
-      { error: "The weather service returned an invalid response." },
-      { status: 502 },
-    );
-  }
-  const temperature = weather.current?.temperature_2m;
-  const weatherCode = weather.current?.weather_code;
-  if (typeof temperature !== "number" || typeof weatherCode !== "number") {
-    return NextResponse.json({ error: "The weather service returned invalid data." }, { status: 502 });
+    currentWeather = await fetchOpenMeteoCurrentWeather(latitude, longitude);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Could not fetch the weather right now.";
+    console.error("Could not load current weather from Open-Meteo.", error);
+    return NextResponse.json({ error: message }, { status: 502 });
   }
 
   return NextResponse.json({
-    temperature,
-    description: weatherDescriptions[weatherCode] ?? "Unknown weather",
+    temperature: currentWeather.temperature_2m,
+    description: weatherDescriptions[currentWeather.weather_code] ?? "Unknown weather",
     icon: "",
     city: country.capital?.[0] ?? country.name.common,
   });

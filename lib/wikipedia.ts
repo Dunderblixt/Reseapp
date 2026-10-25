@@ -5,6 +5,46 @@ export interface WikipediaSummary {
   content_urls?: { desktop?: { page?: string } };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseImage(value: unknown) {
+  if (
+    !isRecord(value) ||
+    typeof value.source !== "string" ||
+    typeof value.width !== "number" ||
+    typeof value.height !== "number"
+  ) {
+    return undefined;
+  }
+
+  return {
+    source: value.source,
+    width: value.width,
+    height: value.height,
+  };
+}
+
+function parseWikipediaSummary(value: unknown): WikipediaSummary | null {
+  if (!isRecord(value)) return null;
+
+  const contentUrls = isRecord(value.content_urls) ? value.content_urls : null;
+  const desktop = contentUrls && isRecord(contentUrls.desktop)
+    ? contentUrls.desktop
+    : null;
+
+  return {
+    extract: typeof value.extract === "string" ? value.extract : undefined,
+    thumbnail: parseImage(value.thumbnail),
+    originalimage: parseImage(value.originalimage),
+    content_urls:
+      desktop && typeof desktop.page === "string"
+        ? { desktop: { page: desktop.page } }
+        : undefined,
+  };
+}
+
 export async function getCountrySummary(
   countryName: string,
 ): Promise<WikipediaSummary | null> {
@@ -19,6 +59,13 @@ export async function getCountrySummary(
 
   if (!response.ok) return null;
 
-  const summary = (await response.json()) as WikipediaSummary;
-  return summary.extract ? summary : null;
+  let result: unknown;
+  try {
+    result = await response.json();
+  } catch {
+    return null;
+  }
+
+  const summary = parseWikipediaSummary(result);
+  return summary?.extract ? summary : null;
 }

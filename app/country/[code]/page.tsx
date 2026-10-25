@@ -1,13 +1,135 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense, use } from "react";
 import { ArrowLeft, ArrowUpRight, Clock3, Languages, MapPin, Users } from "lucide-react";
 import { CountryCard } from "@/components/country-card";
 import { CountryFlag } from "@/components/country-flag";
 import { WeatherPanel } from "@/components/weather-panel";
 import { Button } from "@/components/ui/button";
-import { getCountries, getCountry } from "@/lib/countries";
+import { getCountries, getCountry, type Country } from "@/lib/countries";
 import { getCountrySummary } from "@/lib/wikipedia";
+import type { WikipediaSummary } from "@/lib/wikipedia";
+
+type CountrySummaryPromise = Promise<WikipediaSummary | null>;
+
+function CountryHeroArtwork() {
+  return (
+    <>
+      <div className="absolute -right-8 -top-20 size-72 rounded-full border border-emerald-950/10" />
+      <div className="absolute -right-0 -top-12 size-52 rounded-full border border-emerald-950/10" />
+    </>
+  );
+}
+
+function WikipediaHeroImage({
+  summaryPromise,
+  countryName,
+}: {
+  summaryPromise: CountrySummaryPromise;
+  countryName: string;
+}) {
+  const summary = use(summaryPromise);
+  const image = summary?.originalimage?.source ?? summary?.thumbnail?.source;
+
+  if (!image) return <CountryHeroArtwork />;
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      alt={`Image from Wikipedia for ${countryName}`}
+      className="absolute inset-0 size-full object-cover"
+      fetchPriority="high"
+      src={image}
+    />
+  );
+}
+
+function WikipediaImageSource({
+  summaryPromise,
+}: {
+  summaryPromise: CountrySummaryPromise;
+}) {
+  const summary = use(summaryPromise);
+  const hasImage = summary?.originalimage?.source ?? summary?.thumbnail?.source;
+  const page = summary?.content_urls?.desktop?.page;
+
+  if (!hasImage || !page) return null;
+
+  return (
+    <a
+      className="absolute bottom-3 right-4 z-10 text-xs font-medium text-white/80 underline decoration-white/40 underline-offset-2 hover:text-white"
+      href={page}
+      rel="noreferrer"
+      target="_blank"
+    >
+      Image source: Wikipedia
+    </a>
+  );
+}
+
+function WikipediaDescription({
+  summaryPromise,
+  fallbackDescription,
+}: {
+  summaryPromise: CountrySummaryPromise;
+  fallbackDescription: string;
+}) {
+  const summary = use(summaryPromise);
+
+  return (
+    <>
+      <p className="mt-4 text-[15px] leading-7 text-stone-600">
+        {summary?.extract ?? fallbackDescription}
+      </p>
+      {summary?.content_urls?.desktop?.page && (
+        <a
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 underline decoration-emerald-800/30 underline-offset-4 hover:decoration-emerald-800"
+          href={summary.content_urls.desktop.page}
+          rel="noreferrer"
+          target="_blank"
+        >
+          Read more on Wikipedia <ArrowUpRight aria-hidden="true" size={14} />
+        </a>
+      )}
+    </>
+  );
+}
+
+function RelatedCountries({
+  countriesPromise,
+  country,
+  listingQuery,
+}: {
+  countriesPromise: Promise<Country[]>;
+  country: Country;
+  listingQuery: string;
+}) {
+  const countries = use(countriesPromise);
+  const relatedCountries = countries
+    .filter((item) => item.region === country.region && item.cca3 !== country.cca3)
+    .slice(0, 3);
+
+  if (relatedCountries.length === 0) return null;
+
+  return (
+    <section aria-labelledby="related-title" className="mt-14">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.17em] text-emerald-800">Keep exploring</p>
+      <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight text-emerald-950" id="related-title">
+        More places in {country.region}
+      </h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {relatedCountries.map((related) => (
+          <CountryCard
+            country={related}
+            key={related.cca3}
+            listingQuery={listingQuery}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -68,19 +190,17 @@ export default async function CountryPage({
 
   const listingQuery = getListingQuery(listingParams);
   const returnHref = listingQuery ? `/?${listingQuery}` : "/";
-  const [summary, allCountries] = await Promise.all([
-    getCountrySummary(country.name.common),
-    getCountries(),
-  ]);
+  const summaryPromise = getCountrySummary(country.name.common).catch((error) => {
+    console.error(`Could not load Wikipedia information for ${country.name.common}.`, error);
+    return null;
+  });
+  const countriesPromise = getCountries().catch((error) => {
+    console.error("Could not load related countries.", error);
+    return [];
+  });
   const languages = Object.values(country.languages ?? {});
   const currency = Object.values(country.currencies ?? {})[0];
-  const wikipediaImage =
-    summary?.originalimage?.source ?? summary?.thumbnail?.source;
-  const wikipediaPage = summary?.content_urls?.desktop?.page;
-  const relatedCountries = allCountries
-    .filter((item) => item.region === country.region && item.cca3 !== country.cca3)
-    .slice(0, 3);
-
+  const fallbackDescription = `${country.name.common} is in ${country.region}${country.subregion ? `, in ${country.subregion}` : ""}. It has a population of ${formatNumber(country.population)} and its capital is ${country.capital?.[0] ?? "not available"}.`;
   return (
     <main className="min-h-[70vh] bg-[#faf9f5]">
       <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-10">
@@ -91,31 +211,18 @@ export default async function CountryPage({
         <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
           <div>
             <div className="relative flex min-h-[260px] items-end overflow-hidden rounded-[24px] bg-[#e8ede5] p-7 sm:min-h-[340px] sm:p-10">
-              {wikipediaImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  alt={`Image from Wikipedia for ${country.name.common}`}
-                  className="absolute inset-0 size-full object-cover"
-                  fetchPriority="high"
-                  src={wikipediaImage}
+              <Suspense fallback={<CountryHeroArtwork />}>
+                <WikipediaHeroImage
+                  countryName={country.name.common}
+                  summaryPromise={summaryPromise}
                 />
-              ) : (
-                <>
-                  <div className="absolute -right-8 -top-20 size-72 rounded-full border border-emerald-950/10" />
-                  <div className="absolute -right-0 -top-12 size-52 rounded-full border border-emerald-950/10" />
-                </>
-              )}
+              </Suspense>
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/85 via-emerald-950/15 to-transparent" />
-              {wikipediaImage && wikipediaPage && (
-                <a
-                  className="absolute bottom-3 right-4 z-10 text-xs font-medium text-white/80 underline decoration-white/40 underline-offset-2 hover:text-white"
-                  href={wikipediaPage}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Image source: Wikipedia
-                </a>
-              )}
+              <Suspense fallback={null}>
+                <WikipediaImageSource
+                  summaryPromise={summaryPromise}
+                />
+              </Suspense>
               <div className="relative z-10">
                 <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/75">
                   <MapPin size={13} /> {country.region}{country.subregion ? ` · ${country.subregion}` : ""}
@@ -135,20 +242,18 @@ export default async function CountryPage({
               <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-emerald-950">
                 Discover {country.name.common}
               </h2>
-              <p className="mt-4 text-[15px] leading-7 text-stone-600">
-                {summary?.extract ??
-                  `${country.name.common} is in ${country.region}${country.subregion ? `, in ${country.subregion}` : ""}. It has a population of ${formatNumber(country.population)} and its capital is ${country.capital?.[0] ?? "not available"}.`}
-              </p>
-              {wikipediaPage && (
-                <a
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 underline decoration-emerald-800/30 underline-offset-4 hover:decoration-emerald-800"
-                  href={wikipediaPage}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Read more on Wikipedia <ArrowUpRight aria-hidden="true" size={14} />
-                </a>
-              )}
+              <Suspense
+                fallback={
+                  <p className="mt-4 text-[15px] leading-7 text-stone-600">
+                    {fallbackDescription}
+                  </p>
+                }
+              >
+                <WikipediaDescription
+                  fallbackDescription={fallbackDescription}
+                  summaryPromise={summaryPromise}
+                />
+              </Suspense>
             </article>
 
             <section aria-labelledby="facts-title" className="mt-7">
@@ -207,23 +312,13 @@ export default async function CountryPage({
           </aside>
         </section>
 
-        {relatedCountries.length > 0 && (
-          <section aria-labelledby="related-title" className="mt-14">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.17em] text-emerald-800">Keep exploring</p>
-            <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight text-emerald-950" id="related-title">
-              More places in {country.region}
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedCountries.map((related) => (
-                <CountryCard
-                  country={related}
-                  key={related.cca3}
-                  listingQuery={listingQuery}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <Suspense fallback={null}>
+          <RelatedCountries
+            countriesPromise={countriesPromise}
+            country={country}
+            listingQuery={listingQuery}
+          />
+        </Suspense>
       </div>
     </main>
   );

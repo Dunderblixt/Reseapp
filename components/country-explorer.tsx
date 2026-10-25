@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
 import { z } from "zod";
-import type { Country } from "@/lib/countries";
 import { useCountrySearch } from "@/hooks/use-country-search";
+import { useCountries } from "@/hooks/use-countries";
 import { CountryCard } from "@/components/country-card";
 import { Button } from "@/components/ui/button";
 
@@ -19,15 +18,6 @@ type SearchValues = z.infer<typeof searchSchema>;
 const PAGE_SIZE = 9;
 const ALL_REGIONS = "All regions";
 
-async function fetchCountries(): Promise<Country[]> {
-  const response = await fetch("/api/countries");
-  if (!response.ok) {
-    const result = (await response.json()) as { error?: string };
-    throw new Error(result.error ?? "Could not load countries.");
-  }
-  return (await response.json()) as Country[];
-}
-
 export function CountryExplorer() {
   const [region, setRegion] = useState(ALL_REGIONS);
   const [page, setPage] = useState(1);
@@ -37,12 +27,7 @@ export function CountryExplorer() {
     error,
     isPending,
     refetch,
-  } = useQuery({
-    queryKey: ["countries"],
-    queryFn: fetchCountries,
-    staleTime: 86_400_000,
-    retry: false,
-  });
+  } = useCountries();
   const {
     register,
     watch,
@@ -148,7 +133,7 @@ export function CountryExplorer() {
           <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
           <input
             {...register("query", { onChange: () => setPage(1) })}
-            className="h-12 w-full rounded-xl border border-transparent bg-stone-50 pl-11 pr-4 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10"
+            className="h-12 w-full rounded-xl border border-transparent bg-stone-50 pl-11 pr-4 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
             placeholder="Search by country or capital..."
             type="search"
           />
@@ -157,7 +142,7 @@ export function CountryExplorer() {
           <SlidersHorizontal aria-hidden="true" className="pointer-events-none absolute left-3.5 text-emerald-800" size={16} />
           <label className="sr-only" htmlFor="region-filter">Filter by region</label>
           <select
-            className="h-12 w-full appearance-none rounded-xl border border-transparent bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 sm:min-w-[190px]"
+            className="h-12 w-full appearance-none rounded-xl border border-transparent bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:min-w-[190px]"
             id="region-filter"
             onChange={(event) => {
               setRegion(event.target.value);
