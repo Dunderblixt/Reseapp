@@ -9,7 +9,7 @@ import { CountryFlag } from "@/components/country-flag";
 import { cn } from "@/lib/utils";
 
 function formatPopulation(population: number) {
-  return new Intl.NumberFormat("sv-SE").format(population);
+  return new Intl.NumberFormat("en").format(population);
 }
 
 export function CountryCard({ country }: { country: Country }) {
@@ -22,7 +22,7 @@ export function CountryCard({ country }: { country: Country }) {
         <span className="absolute -right-9 -top-16 size-44 rounded-full border border-emerald-950/10 transition duration-500 group-hover:scale-125" />
         <span className="absolute -right-1 -top-7 size-32 rounded-full border border-emerald-950/10 transition duration-500 group-hover:scale-125" />
         <Button
-          aria-label={saved ? `Ta bort ${country.name.common} från sparade` : `Spara ${country.name.common}`}
+          aria-label={saved ? `Remove ${country.name.common} from saved countries` : `Save ${country.name.common}`}
           aria-pressed={saved}
           className={cn(
             "absolute right-3 top-3 z-10",
@@ -38,7 +38,7 @@ export function CountryCard({ country }: { country: Country }) {
         <Link
           className="relative flex min-h-[120px] flex-col justify-between text-inherit no-underline"
           href={`/country/${country.cca3.toLowerCase()}`}
-          aria-label={`Läs mer om ${country.name.common}`}
+          aria-label={`Learn more about ${country.name.common}`}
         >
           <CountryFlag className="size-10" country={country} />
           <div className="relative flex items-end justify-between gap-3">
@@ -59,10 +59,10 @@ export function CountryCard({ country }: { country: Country }) {
       <div className="flex flex-1 flex-col justify-between px-5 py-4">
         <div className="flex items-center gap-2 text-sm text-stone-600">
           <MapPin aria-hidden="true" className="text-emerald-700" size={15} />
-          <span>{country.capital?.[0] ?? "Huvudstad saknas"}</span>
+          <span>{country.capital?.[0] ?? "Capital unavailable"}</span>
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3 text-xs text-stone-500">
-          <span>Befolkning</span>
+          <span>Population</span>
           <span className="font-medium tabular-nums text-stone-700">
             {formatPopulation(country.population)}
           </span>

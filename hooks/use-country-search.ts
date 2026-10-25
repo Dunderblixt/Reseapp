@@ -18,7 +18,7 @@ export function useCountrySearch(
         country.capital?.some((capital) =>
           capital.toLocaleLowerCase("sv").includes(normalizedQuery),
         );
-      const matchesRegion = region === "Alla regioner" || country.region === region;
+      const matchesRegion = region === "All regions" || country.region === region;
       return matchesQuery && matchesRegion;
     });
   }, [countries, query, region]);

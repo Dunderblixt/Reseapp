@@ -19,15 +19,15 @@ export async function generateMetadata({
   return {
     title: country
       ? `${country.name.common} — Nordresa`
-      : "Landet hittades inte — Nordresa",
+      : "Country not found — Nordresa",
     description: country
-      ? `Upptäck fakta, väder och reseinspiration för ${country.name.common}.`
-      : "Vi kunde inte hitta det här landet.",
+      ? `Discover facts, weather, and travel inspiration for ${country.name.common}.`
+      : "We couldn’t find this country.",
   };
 }
 
 function formatNumber(value: number) {
-  return new Intl.NumberFormat("sv-SE").format(value);
+  return new Intl.NumberFormat("en").format(value);
 }
 
 export default async function CountryPage({
@@ -56,7 +56,7 @@ export default async function CountryPage({
     <main className="min-h-[70vh] bg-[#faf9f5]">
       <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-10">
         <Button asChild className="mb-7" size="sm" variant="ghost">
-          <Link href="/"><ArrowLeft size={16} /> Tillbaka till alla länder</Link>
+          <Link href="/"><ArrowLeft size={16} /> Back to all countries</Link>
         </Button>
 
         <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
@@ -65,7 +65,7 @@ export default async function CountryPage({
               {wikipediaImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  alt={`Bild från Wikipedia för ${country.name.common}`}
+                  alt={`Image from Wikipedia for ${country.name.common}`}
                   className="absolute inset-0 size-full object-cover"
                   fetchPriority="high"
                   src={wikipediaImage}
@@ -84,7 +84,7 @@ export default async function CountryPage({
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Bildkälla: Wikipedia
+                  Image source: Wikipedia
                 </a>
               )}
               <div className="relative z-10">
@@ -102,13 +102,13 @@ export default async function CountryPage({
             </div>
 
             <article className="mt-7 rounded-[22px] border border-stone-200/80 bg-white p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">En första känsla</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Get to know the country</p>
               <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-emerald-950">
-                Lär känna {country.name.common}
+                Discover {country.name.common}
               </h2>
               <p className="mt-4 text-[15px] leading-7 text-stone-600">
                 {summary?.extract ??
-                  `${country.name.common} ligger i ${country.region}${country.subregion ? `, i ${country.subregion}` : ""}. Landet har en befolkning på ${formatNumber(country.population)} invånare och huvudstaden är ${country.capital?.[0] ?? "inte angiven"}.`}
+                  `${country.name.common} is in ${country.region}${country.subregion ? `, in ${country.subregion}` : ""}. It has a population of ${formatNumber(country.population)} and its capital is ${country.capital?.[0] ?? "not available"}.`}
               </p>
               {wikipediaPage && (
                 <a
@@ -117,32 +117,32 @@ export default async function CountryPage({
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Läs mer på Wikipedia <ArrowUpRight aria-hidden="true" size={14} />
+                  Read more on Wikipedia <ArrowUpRight aria-hidden="true" size={14} />
                 </a>
               )}
             </article>
 
             <section aria-labelledby="facts-title" className="mt-7">
               <h2 className="mb-4 font-display text-2xl font-semibold tracking-tight text-emerald-950" id="facts-title">
-                Bra att veta
+                Good to know
               </h2>
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><MapPin size={15} /> Huvudstad</dt>
-                  <dd className="mt-3 font-display text-xl font-semibold text-emerald-950">{country.capital?.[0] ?? "Ej angiven"}</dd>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><MapPin size={15} /> Capital</dt>
+                  <dd className="mt-3 font-display text-xl font-semibold text-emerald-950">{country.capital?.[0] ?? "Not available"}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Users size={15} /> Befolkning</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Users size={15} /> Population</dt>
                   <dd className="mt-3 font-display text-xl font-semibold text-emerald-950">{formatNumber(country.population)}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Languages size={15} /> Språk</dt>
-                  <dd className="mt-3 font-display text-lg font-semibold text-emerald-950">{languages.slice(0, 3).join(", ") || "Ej angivna"}</dd>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Languages size={15} /> Languages</dt>
+                  <dd className="mt-3 font-display text-lg font-semibold text-emerald-950">{languages.slice(0, 3).join(", ") || "Not available"}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Clock3 size={15} /> Valuta</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Clock3 size={15} /> Currency</dt>
                   <dd className="mt-3 font-display text-lg font-semibold text-emerald-950">
-                    {currency ? `${currency.name}${currency.symbol ? ` (${currency.symbol})` : ""}` : "Ej angiven"}
+                    {currency ? `${currency.name}${currency.symbol ? ` (${currency.symbol})` : ""}` : "Not available"}
                   </dd>
                 </div>
               </dl>
@@ -153,7 +153,7 @@ export default async function CountryPage({
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Öppna i Google Maps <ArrowUpRight aria-hidden="true" size={15} />
+                  Open in Google Maps <ArrowUpRight aria-hidden="true" size={15} />
                 </a>
               )}
             </section>
@@ -162,16 +162,16 @@ export default async function CountryPage({
           <aside className="space-y-4">
             <WeatherPanel code={country.cca3} />
             <section className="rounded-2xl border border-stone-200 bg-white p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Landfakta</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Country facts</p>
               <dl className="mt-4 divide-y divide-stone-100 text-sm">
                 <div className="flex justify-between gap-4 py-3 first:pt-0">
                   <dt className="text-stone-500">Region</dt><dd className="text-right font-medium text-stone-800">{country.region}</dd>
                 </div>
                 <div className="flex justify-between gap-4 py-3">
-                  <dt className="text-stone-500">Yta</dt><dd className="text-right font-medium text-stone-800">{country.area ? `${formatNumber(country.area)} km²` : "Ej angiven"}</dd>
+                  <dt className="text-stone-500">Area</dt><dd className="text-right font-medium text-stone-800">{country.area ? `${formatNumber(country.area)} km²` : "Not available"}</dd>
                 </div>
                 <div className="flex justify-between gap-4 py-3 last:pb-0">
-                  <dt className="text-stone-500">Tidszoner</dt><dd className="text-right font-medium text-stone-800">{country.timezones?.length ?? 0}</dd>
+                  <dt className="text-stone-500">Time zones</dt><dd className="text-right font-medium text-stone-800">{country.timezones?.length ?? 0}</dd>
                 </div>
               </dl>
             </section>
@@ -180,9 +180,9 @@ export default async function CountryPage({
 
         {relatedCountries.length > 0 && (
           <section aria-labelledby="related-title" className="mt-14">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.17em] text-emerald-800">Fortsätt upptäcka</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.17em] text-emerald-800">Keep exploring</p>
             <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight text-emerald-950" id="related-title">
-              Fler platser i {country.region}
+              More places in {country.region}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {relatedCountries.map((related) => <CountryCard country={related} key={related.cca3} />)}

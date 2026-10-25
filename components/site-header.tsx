@@ -8,28 +8,28 @@ export function SiteHeader() {
         <Link
           className="flex items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-emerald-950"
           href="/"
-          aria-label="Nordresa, till startsidan"
+          aria-label="Nordresa, home"
         >
           <span className="flex size-9 items-center justify-center rounded-full bg-emerald-950 text-[#e9f15b]">
             <Compass size={19} strokeWidth={1.8} aria-hidden="true" />
           </span>
           nordresa<span className="text-emerald-700">.</span>
         </Link>
-        <nav aria-label="Huvudnavigation" className="flex items-center gap-7">
+        <nav aria-label="Main navigation" className="flex items-center gap-7">
           <Link
             className="text-sm font-medium text-stone-700 transition hover:text-emerald-900"
             href="/"
           >
-            Upptäck
+            Discover
           </Link>
           <a
             className="hidden text-sm font-medium text-stone-700 transition hover:text-emerald-900 sm:inline"
             href="#om-nordresa"
           >
-            Om Nordresa
+            About Nordresa
           </a>
           <span className="hidden rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-600 md:inline">
-            Din nästa resa börjar här
+            Your next journey starts here
           </span>
         </nav>
       </div>

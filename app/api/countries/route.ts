@@ -8,13 +8,13 @@ export async function GET() {
     const countries = await getCountries();
     return NextResponse.json(countries);
   } catch (error) {
-    console.error("Kunde inte hämta landlistan från Rest Countries.", error);
+    console.error("Could not fetch the country list from Rest Countries.", error);
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "Landlistan kunde inte hämtas från Rest Countries.",
+            : "Could not fetch the country list from Rest Countries.",
       },
       { status: 502 },
     );

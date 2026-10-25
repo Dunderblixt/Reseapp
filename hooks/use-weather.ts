@@ -16,9 +16,9 @@ async function fetchWeather(code: string): Promise<Weather> {
     try {
       result = (await response.json()) as { error?: string };
     } catch {
-      throw new Error("Vädertjänsten returnerade ett ogiltigt svar.");
+      throw new Error("The weather service returned an invalid response.");
     }
-    throw new Error(result.error ?? "Vädret kunde inte hämtas.");
+    throw new Error(result.error ?? "Could not load the weather.");
   }
   return (await response.json()) as Weather;
 }

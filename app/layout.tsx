@@ -4,9 +4,9 @@ import { Providers } from "@/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nordresa — hitta ditt nästa äventyr",
+  title: "Nordresa — find your next adventure",
   description:
-    "Upptäck världens länder, hitta reseinspiration och se aktuellt väder med Nordresa.",
+    "Explore countries around the world, find travel inspiration, and check the current weather with Nordresa.",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sv">
+    <html lang="en">
       <body>
         <Providers>
           <SiteHeader />
@@ -26,7 +26,7 @@ export default function RootLayout({
           >
             <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-7 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
               <span className="font-display text-sm font-semibold text-emerald-950">nordresa.</span>
-              <span>Upptäck världen, ett land i taget. Data från Rest Countries, Open-Meteo och Wikipedia.</span>
+              <span>Explore the world, one country at a time. Data from Rest Countries, Open-Meteo, and Wikipedia.</span>
             </div>
           </footer>
         </Providers>

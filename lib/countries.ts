@@ -52,7 +52,7 @@ function getApiKey() {
   const apiKey = process.env.REST_COUNTRIES_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "REST_COUNTRIES_API_KEY saknas. Lägg till den i .env.local eller i hostingplattformens miljövariabler.",
+      "REST_COUNTRIES_API_KEY is missing. Add it to .env.local or your hosting provider’s environment variables.",
     );
   }
   return apiKey;
@@ -72,13 +72,13 @@ async function fetchCountryPage(apiKey: string, offset: number) {
   if (!response.ok) {
     throw new Error(
       result.errors?.[0]?.message ??
-        `Kunde inte hämta länder (HTTP ${response.status}).`,
+        `Could not fetch countries (HTTP ${response.status}).`,
     );
   }
 
   const records = result.data?.objects;
   if (!records) {
-    throw new Error("Rest Countries returnerade ingen landlista.");
+    throw new Error("Rest Countries returned no country list.");
   }
 
   return { records, total: result.data?.meta?.total };
@@ -102,11 +102,11 @@ function toCountry(record: RestCountryRecord): Country {
   const code =
     record.codes?.alpha_3 ||
     record.codes?.alpha_2 ||
-    commonName?.toLocaleLowerCase("sv").replace(/[^a-z0-9]+/g, "-");
+    commonName?.toLocaleLowerCase("en").replace(/[^a-z0-9]+/g, "-");
   const population = record.population;
 
   if (!commonName || !code || typeof population !== "number") {
-    throw new Error("Rest Countries returnerade ett land med ofullständiga basfakta.");
+    throw new Error("Rest Countries returned a country with incomplete basic data.");
   }
 
   const lat = record.coordinates?.lat;
@@ -128,7 +128,7 @@ function toCountry(record: RestCountryRecord): Country {
     capital: record.capitals
       ?.map((item) => item.name)
       .filter((name): name is string => Boolean(name)),
-    region: record.region || "Övrigt",
+    region: record.region || "Other",
     subregion: record.subregion,
     population,
     area: record.area?.kilometers,
@@ -159,7 +159,7 @@ export async function getCountries(): Promise<Country[]> {
   const firstPage = await fetchCountryPage(apiKey, 0);
   const total = firstPage.total;
   if (typeof total !== "number" || total < firstPage.records.length) {
-    throw new Error("Rest Countries returnerade en ogiltig landmängd.");
+    throw new Error("Rest Countries returned an invalid number of countries.");
   }
   const offsets = Array.from(
     { length: Math.ceil(total / PAGE_SIZE) - 1 },
@@ -171,12 +171,12 @@ export async function getCountries(): Promise<Country[]> {
   const records = [firstPage.records, ...remainingPages.map((page) => page.records)].flat();
   if (records.length !== total) {
     throw new Error(
-      `Rest Countries returnerade ${records.length} av ${total} länder.`,
+      `Rest Countries returned ${records.length} of ${total} countries.`,
     );
   }
 
   return records.map(toCountry).sort((a, b) =>
-    a.name.common.localeCompare(b.name.common, "sv"),
+    a.name.common.localeCompare(b.name.common, "en"),
   );
 }
 
