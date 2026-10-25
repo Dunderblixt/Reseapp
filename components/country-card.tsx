@@ -12,7 +12,13 @@ function formatPopulation(population: number) {
   return new Intl.NumberFormat("en").format(population);
 }
 
-export function CountryCard({ country }: { country: Country }) {
+export function CountryCard({
+  country,
+  listingQuery = "",
+}: {
+  country: Country;
+  listingQuery?: string;
+}) {
   const { isSaved, toggleSavedCountry } = useAppContext();
   const saved = isSaved(country.cca3);
 
@@ -37,7 +43,7 @@ export function CountryCard({ country }: { country: Country }) {
         </Button>
         <Link
           className="relative flex min-h-[120px] flex-col justify-between text-inherit no-underline"
-          href={`/country/${country.cca3.toLowerCase()}`}
+          href={`/country/${country.cca3.toLowerCase()}${listingQuery ? `?${listingQuery}` : ""}`}
           aria-label={`Learn more about ${country.name.common}`}
         >
           <CountryFlag className="size-10" country={country} />

@@ -57,6 +57,11 @@ export function CountryExplorer() {
   const filtered = useCountrySearch(countries, query, region);
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageCountries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const listingParams = new URLSearchParams();
+  if (query) listingParams.set("q", query);
+  if (region !== ALL_REGIONS) listingParams.set("region", region);
+  if (page > 1) listingParams.set("page", String(page));
+  const listingQuery = listingParams.toString();
   const regions = [
     ALL_REGIONS,
     ...Array.from(new Set(countries.map((country) => country.region)))
@@ -183,7 +188,13 @@ export function CountryExplorer() {
         </div>
       ) : pageCountries.length ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {pageCountries.map((country) => <CountryCard country={country} key={country.cca3} />)}
+          {pageCountries.map((country) => (
+            <CountryCard
+              country={country}
+              key={country.cca3}
+              listingQuery={listingQuery}
+            />
+          ))}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center">

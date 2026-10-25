@@ -30,15 +30,44 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("en").format(value);
 }
 
+function getListingQuery(searchParams: {
+  q?: string | string[];
+  region?: string | string[];
+  page?: string | string[];
+}) {
+  const params = new URLSearchParams();
+  const query = Array.isArray(searchParams.q) ? searchParams.q[0] : searchParams.q;
+  const region = Array.isArray(searchParams.region)
+    ? searchParams.region[0]
+    : searchParams.region;
+  const page = Array.isArray(searchParams.page)
+    ? searchParams.page[0]
+    : searchParams.page;
+
+  if (query && query.length <= 80) params.set("q", query);
+  if (region) params.set("region", region);
+  if (page && /^[1-9]\d*$/.test(page)) params.set("page", page);
+
+  return params.toString();
+}
+
 export default async function CountryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ code: string }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    region?: string | string[];
+    page?: string | string[];
+  }>;
 }) {
-  const { code } = await params;
+  const [{ code }, listingParams] = await Promise.all([params, searchParams]);
   const country = await getCountry(code);
   if (!country) notFound();
 
+  const listingQuery = getListingQuery(listingParams);
+  const returnHref = listingQuery ? `/?${listingQuery}` : "/";
   const [summary, allCountries] = await Promise.all([
     getCountrySummary(country.name.common),
     getCountries(),
@@ -56,7 +85,7 @@ export default async function CountryPage({
     <main className="min-h-[70vh] bg-[#faf9f5]">
       <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-10">
         <Button asChild className="mb-7" size="sm" variant="ghost">
-          <Link href="/"><ArrowLeft size={16} /> Back to all countries</Link>
+          <Link href={returnHref}><ArrowLeft size={16} /> Back to all countries</Link>
         </Button>
 
         <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
@@ -185,7 +214,13 @@ export default async function CountryPage({
               More places in {country.region}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {relatedCountries.map((related) => <CountryCard country={related} key={related.cca3} />)}
+              {relatedCountries.map((related) => (
+                <CountryCard
+                  country={related}
+                  key={related.cca3}
+                  listingQuery={listingQuery}
+                />
+              ))}
             </div>
           </section>
         )}
