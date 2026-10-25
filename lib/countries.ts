@@ -1,0 +1,188 @@
+export interface Country {
+  cca3: string;
+  name: { common: string; official: string };
+  capital?: string[];
+  region: string;
+  subregion?: string;
+  population: number;
+  area?: number;
+  flag: string;
+  flags: { svg?: string; png?: string; alt?: string };
+  capitalInfo?: { latlng?: [number, number] };
+  currencies?: Record<string, { name: string; symbol?: string }>;
+  languages?: Record<string, string>;
+  timezones: string[];
+  latlng?: [number, number];
+  maps?: { googleMaps?: string };
+}
+
+const PAGE_SIZE = 100;
+
+interface RestCountryRecord {
+  names?: { common?: string; official?: string };
+  codes?: { alpha_2?: string; alpha_3?: string };
+  capitals?: { name?: string; coordinates?: { lat?: number; lng?: number } }[];
+  flag?: {
+    emoji?: string;
+    url_svg?: string;
+    url_png?: string;
+    description?: string;
+  };
+  region?: string;
+  subregion?: string;
+  population?: number;
+  area?: { kilometers?: number };
+  coordinates?: { lat?: number; lng?: number };
+  currencies?: { code?: string; name?: string; symbol?: string }[];
+  languages?:
+    | Record<string, string>
+    | { bcp47?: string; iso639_3?: string; name?: string }[];
+  timezones?: string[];
+}
+
+interface RestCountriesResponse {
+  data?: {
+    objects?: RestCountryRecord[];
+    meta?: { total?: number };
+  };
+  errors?: { message?: string }[];
+}
+
+function getApiKey() {
+  const apiKey = process.env.REST_COUNTRIES_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "REST_COUNTRIES_API_KEY saknas. Lägg till den i .env.local eller i hostingplattformens miljövariabler.",
+    );
+  }
+  return apiKey;
+}
+
+async function fetchCountryPage(apiKey: string, offset: number) {
+  const url = new URL("https://api.restcountries.com/countries/v5");
+  url.searchParams.set("limit", String(PAGE_SIZE));
+  url.searchParams.set("offset", String(offset));
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    next: { revalidate: 86400 },
+  });
+
+  const result = (await response.json()) as RestCountriesResponse;
+  if (!response.ok) {
+    throw new Error(
+      result.errors?.[0]?.message ??
+        `Kunde inte hämta länder (HTTP ${response.status}).`,
+    );
+  }
+
+  const records = result.data?.objects;
+  if (!records) {
+    throw new Error("Rest Countries returnerade ingen landlista.");
+  }
+
+  return { records, total: result.data?.meta?.total };
+}
+
+function asLanguageRecord(entries: RestCountryRecord["languages"]) {
+  if (!entries) return {};
+  if (!Array.isArray(entries)) return entries;
+
+  return Object.fromEntries(
+    entries
+      .flatMap((entry) => {
+        const code = entry.bcp47 || entry.iso639_3;
+        return code && entry.name ? [[code, entry.name]] : [];
+      }),
+  );
+}
+
+function toCountry(record: RestCountryRecord): Country {
+  const commonName = record.names?.common;
+  const code =
+    record.codes?.alpha_3 ||
+    record.codes?.alpha_2 ||
+    commonName?.toLocaleLowerCase("sv").replace(/[^a-z0-9]+/g, "-");
+  const population = record.population;
+
+  if (!commonName || !code || typeof population !== "number") {
+    throw new Error("Rest Countries returnerade ett land med ofullständiga basfakta.");
+  }
+
+  const lat = record.coordinates?.lat;
+  const lng = record.coordinates?.lng;
+  const capital = record.capitals?.[0];
+  const capitalLat = capital?.coordinates?.lat;
+  const capitalLng = capital?.coordinates?.lng;
+  const currencies = record.currencies
+    ?.filter((currency) => currency.code && currency.name)
+    .map((currency) => [currency.code!, { name: currency.name!, symbol: currency.symbol }]);
+  const currencyRecord = Object.fromEntries(currencies ?? []);
+
+  return {
+    cca3: code,
+    name: {
+      common: commonName,
+      official: record.names?.official ?? commonName,
+    },
+    capital: record.capitals
+      ?.map((item) => item.name)
+      .filter((name): name is string => Boolean(name)),
+    region: record.region || "Övrigt",
+    subregion: record.subregion,
+    population,
+    area: record.area?.kilometers,
+    flag: record.flag?.emoji || "🏳️",
+    flags: {
+      svg: record.flag?.url_svg || undefined,
+      png: record.flag?.url_png || undefined,
+      alt: record.flag?.description || undefined,
+    },
+    capitalInfo:
+      typeof capitalLat === "number" && typeof capitalLng === "number"
+        ? { latlng: [capitalLat, capitalLng] }
+        : undefined,
+    currencies: currencyRecord,
+    languages: asLanguageRecord(record.languages),
+    timezones: record.timezones ?? [],
+    latlng:
+      typeof lat === "number" && typeof lng === "number" ? [lat, lng] : undefined,
+    maps:
+      typeof lat === "number" && typeof lng === "number"
+        ? { googleMaps: `https://www.google.com/maps?q=${lat},${lng}` }
+        : undefined,
+  };
+}
+
+export async function getCountries(): Promise<Country[]> {
+  const apiKey = getApiKey();
+  const firstPage = await fetchCountryPage(apiKey, 0);
+  const total = firstPage.total;
+  if (typeof total !== "number" || total < firstPage.records.length) {
+    throw new Error("Rest Countries returnerade en ogiltig landmängd.");
+  }
+  const offsets = Array.from(
+    { length: Math.ceil(total / PAGE_SIZE) - 1 },
+    (_, index) => (index + 1) * PAGE_SIZE,
+  );
+  const remainingPages = await Promise.all(
+    offsets.map((offset) => fetchCountryPage(apiKey, offset)),
+  );
+  const records = [firstPage.records, ...remainingPages.map((page) => page.records)].flat();
+  if (records.length !== total) {
+    throw new Error(
+      `Rest Countries returnerade ${records.length} av ${total} länder.`,
+    );
+  }
+
+  return records.map(toCountry).sort((a, b) =>
+    a.name.common.localeCompare(b.name.common, "sv"),
+  );
+}
+
+export async function getCountry(code: string): Promise<Country | undefined> {
+  const countries = await getCountries();
+  return countries.find(
+    (country) => country.cca3.toLowerCase() === code.toLowerCase(),
+  );
+}
