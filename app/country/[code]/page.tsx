@@ -45,6 +45,9 @@ export default async function CountryPage({
   ]);
   const languages = Object.values(country.languages ?? {});
   const currency = Object.values(country.currencies ?? {})[0];
+  const wikipediaImage =
+    summary?.originalimage?.source ?? summary?.thumbnail?.source;
+  const wikipediaPage = summary?.content_urls?.desktop?.page;
   const relatedCountries = allCountries
     .filter((item) => item.region === country.region && item.cca3 !== country.cca3)
     .slice(0, 3);
@@ -59,12 +62,13 @@ export default async function CountryPage({
         <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
           <div>
             <div className="relative flex min-h-[260px] items-end overflow-hidden rounded-[24px] bg-[#e8ede5] p-7 sm:min-h-[340px] sm:p-10">
-              {summary?.thumbnail?.source ? (
+              {wikipediaImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  alt={`Landskap i ${country.name.common}`}
+                  alt={`Bild från Wikipedia för ${country.name.common}`}
                   className="absolute inset-0 size-full object-cover"
-                  src={summary.thumbnail.source}
+                  fetchPriority="high"
+                  src={wikipediaImage}
                 />
               ) : (
                 <>
@@ -73,6 +77,16 @@ export default async function CountryPage({
                 </>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/85 via-emerald-950/15 to-transparent" />
+              {wikipediaImage && wikipediaPage && (
+                <a
+                  className="absolute bottom-3 right-4 z-10 text-xs font-medium text-white/80 underline decoration-white/40 underline-offset-2 hover:text-white"
+                  href={wikipediaPage}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Bildkälla: Wikipedia
+                </a>
+              )}
               <div className="relative z-10">
                 <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/75">
                   <MapPin size={13} /> {country.region}{country.subregion ? ` · ${country.subregion}` : ""}
@@ -96,10 +110,10 @@ export default async function CountryPage({
                 {summary?.extract ??
                   `${country.name.common} ligger i ${country.region}${country.subregion ? `, i ${country.subregion}` : ""}. Landet har en befolkning på ${formatNumber(country.population)} invånare och huvudstaden är ${country.capital?.[0] ?? "inte angiven"}.`}
               </p>
-              {summary?.content_urls?.desktop?.page && (
+              {wikipediaPage && (
                 <a
                   className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 underline decoration-emerald-800/30 underline-offset-4 hover:decoration-emerald-800"
-                  href={summary.content_urls.desktop.page}
+                  href={wikipediaPage}
                   rel="noreferrer"
                   target="_blank"
                 >

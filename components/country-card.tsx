@@ -43,8 +43,8 @@ export function CountryCard({ country }: { country: Country }) {
           <CountryFlag className="size-10" country={country} />
           <div className="relative flex items-end justify-between gap-3">
             <div>
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.17em] text-emerald-900/60">
-                {country.region}
+              <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-900/70">
+                Region: {country.region}
               </p>
               <h2 className="font-display text-[23px] font-semibold leading-tight tracking-tight text-emerald-950">
                 {country.name.common}
