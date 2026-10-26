@@ -9,14 +9,14 @@ export function useCountrySearch(
   region: string,
 ) {
   return useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("sv");
+    const normalizedQuery = query.trim().toLocaleLowerCase("en");
 
     return countries.filter((country) => {
       const matchesQuery =
         !normalizedQuery ||
-        country.name.common.toLocaleLowerCase("sv").includes(normalizedQuery) ||
+        country.name.common.toLocaleLowerCase("en").includes(normalizedQuery) ||
         country.capital?.some((capital) =>
-          capital.toLocaleLowerCase("sv").includes(normalizedQuery),
+          capital.toLocaleLowerCase("en").includes(normalizedQuery),
         );
       const matchesRegion = region === "All regions" || country.region === region;
       return matchesQuery && matchesRegion;

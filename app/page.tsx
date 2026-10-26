@@ -29,7 +29,7 @@ export default function HomePage() {
             </a>
           </div>
 
-          <div aria-label="Travel inspiration: mountains and nature" className="relative hidden min-h-[320px] items-center justify-center lg:flex">
+          <div aria-hidden="true" className="relative hidden min-h-[320px] items-center justify-center lg:flex">
             <div className="absolute size-[300px] rounded-full border border-white/10" />
             <div className="absolute size-[235px] rounded-full border border-white/10" />
             <div className="relative flex size-[174px] items-center justify-center rounded-full bg-[#e9f15b] text-emerald-950 shadow-[0_0_100px_rgba(233,241,91,0.13)]">
@@ -40,7 +40,7 @@ export default function HomePage() {
               <p className="mt-1 text-sm font-semibold text-white">That’s up to you.</p>
             </div>
             <div className="absolute bottom-7 left-2 -rotate-3 rounded-2xl border border-white/15 bg-white px-4 py-3 shadow-xl">
-              <p className="text-xs text-stone-500">Din resa, ditt tempo</p>
+              <p className="text-xs text-stone-500">Your journey, your pace</p>
               <p className="mt-1 text-sm font-semibold text-emerald-950">No rush, no must-dos ✦</p>
             </div>
           </div>

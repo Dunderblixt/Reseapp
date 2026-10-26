@@ -23,7 +23,7 @@ export function WeatherPanel({ code }: { code: string }) {
   if (error || !data) {
     return (
       <section aria-live="polite" className="rounded-2xl border border-stone-200 bg-white p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Just nu</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Current weather</p>
         <p className="mt-3 text-sm text-stone-600">{error?.message ?? "Could not load the weather."}</p>
         <Button className="mt-4" onClick={() => void refetch()} size="sm" variant="outline">
           <RefreshCw size={14} /> Try again

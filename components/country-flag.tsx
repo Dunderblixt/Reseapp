@@ -14,7 +14,7 @@ export function CountryFlag({
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        alt={`Flagga: ${country.name.common}`}
+        alt={`${country.name.common} flag`}
         className={cn("inline-flex shrink-0 object-contain", className)}
         src={source}
       />
@@ -23,7 +23,7 @@ export function CountryFlag({
 
   return (
     <span
-      aria-label={`Flagga: ${country.name.common}`}
+      aria-label={`Flag of ${country.name.common}`}
       className={cn("inline-flex shrink-0 items-center justify-center", className)}
       role="img"
     >
