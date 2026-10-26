@@ -1,6 +1,10 @@
 export interface Country {
   cca3: string;
-  name: { common: string; official: string };
+  name: {
+    common: string;
+    official: string;
+    native?: Record<string, { common: string; official?: string }>;
+  };
   capital?: string[];
   region: string;
   subregion?: string;
@@ -19,7 +23,11 @@ export interface Country {
 const PAGE_SIZE = 100;
 
 interface RestCountryRecord {
-  names?: { common?: string; official?: string };
+  names?: {
+    common?: string;
+    official?: string;
+    native?: Record<string, { common?: string; official?: string }>;
+  };
   codes?: { alpha_2?: string; alpha_3?: string };
   capitals?: { name?: string; coordinates?: { lat?: number; lng?: number } }[];
   flag?: {
@@ -140,6 +148,23 @@ function asLanguageRecord(entries: RestCountryRecord["languages"]) {
   );
 }
 
+function toNativeNames(
+  native: Record<string, { common?: string; official?: string }> | undefined,
+): Record<string, { common: string; official?: string }> | undefined {
+  if (!native) return undefined;
+
+  const result: Record<string, { common: string; official?: string }> = {};
+
+  for (const [code, value] of Object.entries(native)) {
+    const common = value?.common ?? value?.official;
+    if (common) {
+      result[code] = { common, official: value?.official };
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
 function toCountry(record: RestCountryRecord): Country {
   const commonName = record.names?.common;
   const code =
@@ -167,6 +192,7 @@ function toCountry(record: RestCountryRecord): Country {
     name: {
       common: commonName,
       official: record.names?.official ?? commonName,
+      native: toNativeNames(record.names?.native),
     },
     capital: record.capitals
       ?.map((item) => item.name)

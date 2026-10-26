@@ -214,6 +214,16 @@ export default async function CountryPage({
   });
   const languages = Object.values(country.languages ?? {});
   const currency = Object.values(country.currencies ?? {})[0];
+  const nativeNameByLabel = new Map<string, { code: string; name: string }>();
+  for (const [code, value] of Object.entries(country.name.native ?? {})) {
+    if (value.common) {
+      nativeNameByLabel.set(value.common, { code, name: value.common });
+    }
+  }
+  const nativeNames = [...nativeNameByLabel.values()];
+  const showOfficialName =
+    country.name.official !== country.name.common &&
+    nativeNames.every((entry) => entry.name !== country.name.official);
   const fallbackDescription = `${country.name.common} is in ${country.region}${country.subregion ? `, in ${country.subregion}` : ""}. It has a population of ${formatNumber(country.population)} and its capital is ${country.capital?.[0] ?? "not available"}.`;
   return (
     <main className="min-h-[70vh] bg-[#faf9f5]">
@@ -247,7 +257,21 @@ export default async function CountryPage({
                     {country.name.common}
                   </h1>
                 </div>
-                <p className="mt-3 text-sm text-white/75">{country.name.official}</p>
+                {(nativeNames.length > 0 || showOfficialName) && (
+                  <div className="mt-3 space-y-1 text-sm text-white/75">
+                    {nativeNames.length > 0 && (
+                      <p>
+                        {nativeNames.map((entry, index) => (
+                          <span key={entry.code}>
+                            {index > 0 ? " · " : ""}
+                            <span lang={entry.code}>{entry.name}</span>
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    {showOfficialName && <p>{country.name.official}</p>}
+                  </div>
+                )}
               </div>
             </div>
 
