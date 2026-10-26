@@ -3,9 +3,9 @@ import { FavouritesView } from "@/components/favourites-view";
 import { CompareView } from "@/components/compare-view";
 
 export const metadata: Metadata = {
-  title: "Favourite countries — Nordresa",
+  title: "Favourite countries — Nordtravel",
   description:
-    "Countries you have saved as favourites for your next adventure with Nordresa.",
+    "Countries you have saved as favourites for your next adventure with Nordtravel.",
 };
 
 export default async function FavouritesPage({

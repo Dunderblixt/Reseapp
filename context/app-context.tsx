@@ -10,7 +10,8 @@ interface AppContextValue {
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
-const STORAGE_KEY = "nordresa:favourite-countries";
+const STORAGE_KEY = "nordtravel:favourite-countries";
+const LEGACY_STORAGE_KEY = "nordresa:favourite-countries";
 
 export function AppContextProvider({
   children,
@@ -22,7 +23,9 @@ export function AppContextProvider({
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
+      const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+      const stored = window.localStorage.getItem(STORAGE_KEY) ?? legacy;
+
       if (stored) {
         const parsed: unknown = JSON.parse(stored);
         if (Array.isArray(parsed)) {
@@ -30,6 +33,11 @@ export function AppContextProvider({
             parsed.filter((code): code is string => typeof code === "string"),
           );
         }
+      }
+
+      if (legacy !== null && window.localStorage.getItem(STORAGE_KEY) === null) {
+        window.localStorage.setItem(STORAGE_KEY, legacy);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
       }
     } catch {
       // Ignore unreadable storage and start with an empty list.

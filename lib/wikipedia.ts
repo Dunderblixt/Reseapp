@@ -52,7 +52,7 @@ export async function getCountrySummary(
   const response = await fetch(
     `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`,
     {
-      headers: { "User-Agent": "Nordresa/1.0 (travel discovery app)" },
+      headers: { "User-Agent": "Nordtravel/1.0 (travel discovery app)" },
       next: { revalidate: 86400 },
     },
   );

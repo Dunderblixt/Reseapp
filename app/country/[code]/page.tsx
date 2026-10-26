@@ -140,8 +140,8 @@ export async function generateMetadata({
   const country = await getCountry(code);
   return {
     title: country
-      ? `${country.name.common} — Nordresa`
-      : "Country not found — Nordresa",
+      ? `${country.name.common} — Nordtravel`
+      : "Country not found — Nordtravel",
     description: country
       ? `Discover facts, weather, and travel inspiration for ${country.name.common}.`
       : "We couldn’t find this country.",

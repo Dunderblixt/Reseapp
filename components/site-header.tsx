@@ -9,12 +9,12 @@ export function SiteHeader() {
         <Link
           className="flex items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-emerald-950"
           href="/"
-          aria-label="Nordresa, home"
+          aria-label="Nordtravel, home"
         >
           <span className="flex size-9 items-center justify-center rounded-full bg-emerald-950 text-[#e9f15b]">
             <Compass size={19} strokeWidth={1.8} aria-hidden="true" />
           </span>
-          nordresa<span className="text-emerald-700">.</span>
+          nordtravel<span className="text-emerald-700">.</span>
         </Link>
         <nav aria-label="Main navigation" className="flex items-center gap-7">
           <Link
@@ -26,9 +26,9 @@ export function SiteHeader() {
           <FavouritesNavLink />
           <a
             className="hidden text-sm font-medium text-stone-700 transition hover:text-emerald-900 sm:inline"
-            href="#om-nordresa"
+            href="#om-nordtravel"
           >
-            About Nordresa
+            About Nordtravel
           </a>
           <span className="hidden rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-600 md:inline">
             Your next journey starts here
