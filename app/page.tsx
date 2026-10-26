@@ -17,7 +17,7 @@ export default function HomePage() {
             <h1 className="mt-6 max-w-[700px] font-display text-[46px] font-medium leading-[1.05] tracking-[-0.04em] text-white sm:text-[60px] lg:text-[72px]">
               The world is
               <br />
-              <span className="font-serif italic text-[#e9f15b]">closer</span> than
+              <span className="text-[0.8em] font-serif italic text-[#e9f15b]">closer</span> than
               <br />
               you think.
             </h1>
