@@ -5,6 +5,7 @@ import { Suspense, use } from "react";
 import { ArrowLeft, ArrowUpRight, Clock3, Languages, MapPin, Users } from "lucide-react";
 import { CountryCard } from "@/components/country-card";
 import { CountryFlag } from "@/components/country-flag";
+import { SaveCountryButton } from "@/components/save-country-button";
 import { WeatherPanel } from "@/components/weather-panel";
 import { Button } from "@/components/ui/button";
 import { getCountries, getCountry, type Country } from "@/lib/countries";
@@ -242,6 +243,13 @@ export default async function CountryPage({
                 />
               </Suspense>
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/85 via-emerald-950/15 to-transparent" />
+              <div className="absolute right-4 top-4 z-10">
+                <SaveCountryButton
+                  className="border border-white/25 bg-emerald-950/40 text-white backdrop-blur hover:bg-emerald-950/60 focus-visible:ring-white"
+                  code={country.cca3}
+                  name={country.name.common}
+                />
+              </div>
               <Suspense fallback={null}>
                 <WikipediaImageSource
                   summaryPromise={summaryPromise}
