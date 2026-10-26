@@ -42,7 +42,7 @@ function HighestBadge() {
   );
 }
 
-// Renders a value with an optional note and badge.
+// Renders a value with an optional note and badge for the highest value.
 function ValueCell({
   value,
   note,
@@ -141,12 +141,13 @@ export function CompareView({
   initialA?: string;
   initialB?: string;
 }) {
+  // App context and country data.
   const { savedCountries, hydrated } = useAppContext();
   const { data: countries = [], error, isPending, refetch } = useCountries();
   const router = useRouter();
   const [a, setA] = useState(initialA ?? "");
   const [b, setB] = useState(initialB ?? "");
-
+// Memoized lookups for countries and saved favourites.
   const byCode = useMemo(
     () => new Map(countries.map((country) => [country.cca3, country])),
     [countries],
@@ -159,7 +160,7 @@ export function CompareView({
         .filter((country): country is Country => Boolean(country)),
     [savedCountries, byCode],
   );
-
+// Validates the selected countries and falls back to the first two saved favourites.
   const validA =
     savedSet.has(a) && byCode.has(a) ? a : savedOptions[0]?.cca3 ?? "";
   const validB =
@@ -169,7 +170,7 @@ export function CompareView({
 
   const weatherA = useWeather(validA);
   const weatherB = useWeather(validB);
-
+// Updates the selected countries and URL when favourites change or on initial load.
   useEffect(() => {
     if (!hydrated || isPending || error) return;
     if (savedOptions.length < 2) return;
@@ -212,7 +213,7 @@ export function CompareView({
     );
   }
   if (savedOptions.length < 2) return <NeedTwoFavourites />;
-
+// Validates the selected countries and fetches their weather data.
   const countryA = byCode.get(validA);
   const countryB = byCode.get(validB);
   if (!countryA || !countryB) return <NeedTwoFavourites />;
@@ -234,7 +235,7 @@ export function CompareView({
 
     if (side === "a") setA(code);
     else setB(code);
-
+// Updates the URL with the new selected countries without scrolling.
     const params = new URLSearchParams({ a: nextA, b: nextB });
     router.replace(`/favourites?${params.toString()}`, { scroll: false });
   }
