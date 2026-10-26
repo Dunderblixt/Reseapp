@@ -14,7 +14,9 @@ export function SiteHeader() {
           <span className="flex size-9 items-center justify-center rounded-full bg-emerald-950 text-[#e9f15b]">
             <Compass size={19} strokeWidth={1.8} aria-hidden="true" />
           </span>
-          nordtravel<span className="text-emerald-700">.</span>
+          <span className="max-[359px]:hidden">
+            nordtravel<span className="text-emerald-700">.</span>
+          </span>
         </Link>
         <nav aria-label="Main navigation" className="flex items-center gap-7">
           <Link
