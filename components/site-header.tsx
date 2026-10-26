@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Compass } from "lucide-react";
+import { FavouritesNavLink } from "@/components/favourites-nav-link";
 
 export function SiteHeader() {
   return (
@@ -22,6 +23,7 @@ export function SiteHeader() {
           >
             Discover
           </Link>
+          <FavouritesNavLink />
           <a
             className="hidden text-sm font-medium text-stone-700 transition hover:text-emerald-900 sm:inline"
             href="#om-nordresa"
