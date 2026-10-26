@@ -107,4 +107,5 @@ docs/         Projektskiss och resurser
 
 ## Reflektioner
 
-Jag valde att använda AI så mycket som möjligt, då de jag känner i branschen säger att det är vad de gör. Jag hade en del svårigheter med att få Deepseek for Copilot att fungera och fick använda deras chat service för att hitta alla inställningar som behövdes för att köra OAI Compatible Copilot. jag hade också lite krångel med git då jag var project leader på vår versionshanteringskurs så hade jag tillgång till main och behövde inte göra några pull requests. Därför hade jag väldigt mycket svårigheter med git och en del commits ser lite tokiga ut då jag glömt ansluta till repot ibland.
+Jag valde att använda AI så mycket som möjligt, då de jag känner i branschen säger att det är vad de gör. Jag hade en del svårigheter med att få Deepseek for Copilot att fungera och fick använda deras chat service för att hitta alla inställningar som behövdes för att köra OAI Compatible Copilot. jag hade också lite krångel med git då jag var project leader på vår versionshanteringskurs så hade jag tillgång till main och behövde inte göra några pull requests. Därför hade jag väldigt mycket svårigheter med git och en del commits ser lite tokiga ut då jag glömt ansluta till repot ibland. 
+Jag behöver träna bash och git mer.
