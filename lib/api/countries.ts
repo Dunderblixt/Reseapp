@@ -4,18 +4,22 @@ interface CountriesApiError {
   error: string;
 }
 
+// Type guard for plain objects.
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+// Type guard for countries API errors.
 function isCountriesApiError(value: unknown): value is CountriesApiError {
   return isRecord(value) && typeof value.error === "string";
 }
 
+// Checks for a string or undefined.
 function isOptionalString(value: unknown): boolean {
   return value === undefined || typeof value === "string";
 }
 
+// Checks for a [number, number] pair.
 function isNumberPair(value: unknown): boolean {
   return (
     Array.isArray(value) &&
@@ -25,6 +29,7 @@ function isNumberPair(value: unknown): boolean {
   );
 }
 
+// Validates a country response object.
 function isCountry(value: unknown): value is Country {
   if (!isRecord(value) || !isRecord(value.name) || !isRecord(value.flags)) {
     return false;
@@ -81,6 +86,7 @@ function isCountry(value: unknown): value is Country {
   );
 }
 
+// Extracts an error message from a response.
 function getErrorMessage(value: unknown): string | undefined {
   if (isCountriesApiError(value)) {
     return value.error;
@@ -88,6 +94,7 @@ function getErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
+// Fetches and validates the country list.
 export async function fetchCountries(): Promise<Country[]> {
   const response = await fetch("/api/countries");
   let result: unknown;

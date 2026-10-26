@@ -4,6 +4,7 @@ import { CloudSun, Droplets, LoaderCircle, MapPin, RefreshCw, Wind } from "lucid
 import { useWeather } from "@/hooks/use-weather";
 import { Button } from "@/components/ui/button";
 
+// Shows current weather for a country.
 export function WeatherPanel({ code }: { code: string }) {
   const { data, error, isPending, refetch } = useWeather(code);
 

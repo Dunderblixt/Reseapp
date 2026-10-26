@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAppContext } from "@/context/app-context";
 
+// Nav link showing the number of saved favourites.
 export function FavouritesNavLink() {
   const { savedCountries, hydrated } = useAppContext();
   const count = savedCountries.length;

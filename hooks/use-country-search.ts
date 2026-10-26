@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { Country } from "@/lib/countries";
 
+// Filters countries by query and region.
 export function useCountrySearch(
   countries: Country[],
   query: string,

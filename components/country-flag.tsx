@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { Country } from "@/lib/countries";
 
+// Renders a country flag image or emoji fallback.
 export function CountryFlag({
   country,
   className,

@@ -1,5 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 
+// Route-level loading state.
 export default function Loading() {
   return (
     <main

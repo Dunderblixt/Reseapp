@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Compass } from "lucide-react";
 import { FavouritesNavLink } from "@/components/favourites-nav-link";
 
+// Site header with logo and navigation.
 export function SiteHeader() {
   return (
     <header className="border-b border-stone-200/80 bg-[#faf9f5]">

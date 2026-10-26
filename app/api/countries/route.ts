@@ -3,6 +3,7 @@ import { getCountries } from "@/lib/countries";
 
 export const revalidate = 86400;
 
+// Returns the full country list.
 export async function GET() {
   try {
     const countries = await getCountries();

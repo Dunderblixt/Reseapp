@@ -1,6 +1,7 @@
 import { ArrowDown, Globe2, Sparkles } from "lucide-react";
 import { CountryExplorer } from "@/components/country-explorer";
 
+// Home page with the hero and country explorer.
 export default function HomePage() {
   return (
     <main>

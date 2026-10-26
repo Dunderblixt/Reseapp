@@ -13,22 +13,26 @@ import { cn } from "@/lib/utils";
 
 type WeatherQuery = ReturnType<typeof useWeather>;
 
+// Formats a number with thousands separators.
 function formatNumber(value: number) {
   return new Intl.NumberFormat("en").format(value);
 }
 
+// Formats an area in km², or "Not available".
 function formatArea(value?: number) {
   return typeof value === "number"
     ? `${formatNumber(value)} km²`
     : "Not available";
 }
 
+// Returns which side has the higher number.
 function numericWinner(a?: number, b?: number): "a" | "b" | null {
   if (typeof a !== "number" || typeof b !== "number") return null;
   if (a === b) return null;
   return a > b ? "a" : "b";
 }
 
+// Small "Highest" marker for the winning value.
 function HighestBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950 px-1.5 py-0.5 text-[10px] font-semibold text-[#e9f15b] sm:px-2 sm:text-[11px]">
@@ -38,6 +42,7 @@ function HighestBadge() {
   );
 }
 
+// Renders a value with an optional note and badge.
 function ValueCell({
   value,
   note,
@@ -67,6 +72,7 @@ function ValueCell({
   );
 }
 
+// Renders weather, or a loading/unavailable state.
 function WeatherValue({
   query,
   highest,
@@ -96,6 +102,7 @@ function WeatherValue({
   );
 }
 
+// Simple loading message.
 function Loading({ label }: { label: string }) {
   return (
     <div aria-busy="true" className="mt-10 flex justify-center">
@@ -107,6 +114,7 @@ function Loading({ label }: { label: string }) {
   );
 }
 
+// Empty state when fewer than two favourites exist.
 function NeedTwoFavourites() {
   return (
     <div className="mt-10 rounded-[24px] border border-dashed border-stone-300 bg-white px-6 py-20 text-center">
@@ -125,6 +133,7 @@ function NeedTwoFavourites() {
   );
 }
 
+// Compares two favourite countries side by side.
 export function CompareView({
   initialA,
   initialB,
@@ -218,6 +227,7 @@ export function CompareView({
     weatherB.data?.temperature,
   );
 
+  // Updates the selected country and the URL.
   function handleChange(side: "a" | "b", code: string) {
     const nextA = side === "a" ? code : validA;
     const nextB = side === "b" ? code : validB;

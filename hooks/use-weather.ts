@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWeather } from "@/lib/api/weather";
 
+// Fetches current weather for a country.
 export function useWeather(code: string) {
   return useQuery({
     queryKey: ["weather", code],

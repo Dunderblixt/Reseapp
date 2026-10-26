@@ -7,10 +7,12 @@ interface OpenMeteoForecastResponse {
   current: OpenMeteoCurrentWeather;
 }
 
+// Type guard for plain objects.
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+// Validates an Open-Meteo forecast response.
 function isForecastResponse(
   value: unknown,
 ): value is OpenMeteoForecastResponse {
@@ -22,6 +24,7 @@ function isForecastResponse(
   );
 }
 
+// Fetches current weather from Open-Meteo.
 export async function fetchOpenMeteoCurrentWeather(
   latitude: number,
   longitude: number,

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     "Explore countries around the world, find travel inspiration, and check the current weather with Nordtravel.",
 };
 
+// Root layout with providers, header, and footer.
 export default function RootLayout({
   children,
 }: Readonly<{

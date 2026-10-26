@@ -25,14 +25,17 @@ type SortDirection = "asc" | "desc";
 const DEFAULT_SORT: SortField = "name";
 const DEFAULT_DIRECTION: SortDirection = "asc";
 
+// Type guard for a valid sort field.
 function isSortField(value: string | null): value is SortField {
   return value !== null && (SORT_FIELDS as readonly string[]).includes(value);
 }
 
+// Type guard for a valid sort direction.
 function isSortDirection(value: string | null): value is SortDirection {
   return value === "asc" || value === "desc";
 }
 
+// Sorts countries by name, population, or area.
 function sortCountries(
   list: Country[],
   field: SortField,
@@ -58,6 +61,7 @@ function sortCountries(
   });
 }
 
+// Searchable, filterable, sortable country explorer.
 export function CountryExplorer() {
   const [region, setRegion] = useState(ALL_REGIONS);
   const [sort, setSort] = useState<SortField>(DEFAULT_SORT);

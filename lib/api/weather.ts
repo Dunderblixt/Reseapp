@@ -9,14 +9,17 @@ interface WeatherApiError {
   error: string;
 }
 
+// Type guard for plain objects.
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+// Type guard for weather API errors.
 function isWeatherApiError(value: unknown): value is WeatherApiError {
   return isRecord(value) && typeof value.error === "string";
 }
 
+// Extracts an error message from a response.
 function getErrorMessage(value: unknown): string | undefined {
   if (isWeatherApiError(value)) {
     return value.error;
@@ -24,6 +27,7 @@ function getErrorMessage(value: unknown): string | undefined {
   return undefined;
 }
 
+// Validates a weather response object.
 function isWeather(value: unknown): value is Weather {
   return (
     isRecord(value) &&
@@ -34,6 +38,7 @@ function isWeather(value: unknown): value is Weather {
   );
 }
 
+// Fetches and validates weather for a country.
 export async function fetchWeather(code: string): Promise<Weather> {
   const response = await fetch(`/api/weather/${encodeURIComponent(code)}`);
   let result: unknown;

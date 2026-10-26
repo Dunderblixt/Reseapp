@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     "Countries you have saved as favourites for your next adventure with Nordtravel.",
 };
 
+// Favourites page with the saved list and comparison.
 export default async function FavouritesPage({
   searchParams,
 }: {

@@ -5,10 +5,12 @@ export interface WikipediaSummary {
   content_urls?: { desktop?: { page?: string } };
 }
 
+// Type guard for plain objects.
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+// Parses a Wikipedia image object.
 function parseImage(value: unknown) {
   if (
     !isRecord(value) ||
@@ -26,6 +28,7 @@ function parseImage(value: unknown) {
   };
 }
 
+// Parses a Wikipedia summary response.
 function parseWikipediaSummary(value: unknown): WikipediaSummary | null {
   if (!isRecord(value)) return null;
 
@@ -45,6 +48,7 @@ function parseWikipediaSummary(value: unknown): WikipediaSummary | null {
   };
 }
 
+// Fetches a Wikipedia summary for a country.
 export async function getCountrySummary(
   countryName: string,
 ): Promise<WikipediaSummary | null> {

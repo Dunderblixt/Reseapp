@@ -14,6 +14,7 @@ import type { WikipediaSummary } from "@/lib/wikipedia";
 
 type CountrySummaryPromise = Promise<WikipediaSummary | null>;
 
+// Decorative circles shown when there is no hero image.
 function CountryHeroArtwork() {
   return (
     <>
@@ -23,6 +24,7 @@ function CountryHeroArtwork() {
   );
 }
 
+// Renders the Wikipedia hero image for the country.
 function WikipediaHeroImage({
   summaryPromise,
   countryName,
@@ -46,6 +48,7 @@ function WikipediaHeroImage({
   );
 }
 
+// Shows the Wikipedia image-source link.
 function WikipediaImageSource({
   summaryPromise,
 }: {
@@ -69,6 +72,7 @@ function WikipediaImageSource({
   );
 }
 
+// Shows the Wikipedia extract and article link.
 function WikipediaDescription({
   summaryPromise,
   fallbackDescription,
@@ -97,6 +101,7 @@ function WikipediaDescription({
   );
 }
 
+// Lists other countries from the same region.
 function RelatedCountries({
   countriesPromise,
   country,
@@ -132,6 +137,7 @@ function RelatedCountries({
   );
 }
 
+// Builds the page title and description.
 export async function generateMetadata({
   params,
 }: {
@@ -149,10 +155,12 @@ export async function generateMetadata({
   };
 }
 
+// Formats a number with thousands separators.
 function formatNumber(value: number) {
   return new Intl.NumberFormat("en").format(value);
 }
 
+// Rebuilds the explorer query string for the back link.
 function getListingQuery(searchParams: {
   q?: string | string[];
   region?: string | string[];
@@ -186,6 +194,7 @@ function getListingQuery(searchParams: {
   return params.toString();
 }
 
+// Country detail page (server component).
 export default async function CountryPage({
   params,
   searchParams,
@@ -199,10 +208,11 @@ export default async function CountryPage({
     page?: string | string[];
   }>;
 }) {
+  //destructure
   const [{ code }, listingParams] = await Promise.all([params, searchParams]);
   const country = await getCountry(code);
   if (!country) notFound();
-
+//back navigation link
   const listingQuery = getListingQuery(listingParams);
   const returnHref = listingQuery ? `/?${listingQuery}` : "/";
   const summaryPromise = getCountrySummary(country.name.common).catch((error) => {
@@ -213,6 +223,7 @@ export default async function CountryPage({
     console.error("Could not load related countries.", error);
     return [];
   });
+  //extract languages and currency
   const languages = Object.values(country.languages ?? {});
   const currency = Object.values(country.currencies ?? {})[0];
   const nativeNameByLabel = new Map<string, { code: string; name: string }>();
@@ -221,10 +232,12 @@ export default async function CountryPage({
       nativeNameByLabel.set(value.common, { code, name: value.common });
     }
   }
+  //extract native names and official name
   const nativeNames = [...nativeNameByLabel.values()];
   const showOfficialName =
     country.name.official !== country.name.common &&
     nativeNames.every((entry) => entry.name !== country.name.official);
+    //fallback description if Wikipedia summary is unavailable
   const fallbackDescription = `${country.name.common} is in ${country.region}${country.subregion ? `, in ${country.subregion}` : ""}. It has a population of ${formatNumber(country.population)} and its capital is ${country.capital?.[0] ?? "not available"}.`;
   return (
     <main className="min-h-[70vh] bg-[#faf9f5]">

@@ -7,6 +7,7 @@ import { useCountries } from "@/hooks/use-countries";
 import { CountryCard } from "@/components/country-card";
 import { Button } from "@/components/ui/button";
 
+// Lists the user's saved countries.
 export function FavouritesView() {
   const { savedCountries, hydrated } = useAppContext();
   const { data: countries = [], error, isPending, refetch } = useCountries();

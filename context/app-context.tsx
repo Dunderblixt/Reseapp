@@ -13,6 +13,7 @@ const AppContext = createContext<AppContextValue | null>(null);
 const STORAGE_KEY = "nordtravel:favourite-countries";
 const LEGACY_STORAGE_KEY = "nordresa:favourite-countries";
 
+// Provides favourites state and localStorage persistence.
 export function AppContextProvider({
   children,
 }: {
@@ -72,6 +73,7 @@ export function AppContextProvider({
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
+// Accesses the favourites context.
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) {

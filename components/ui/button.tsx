@@ -29,6 +29,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
     asChild?: boolean;
   };
 
+// Reusable button with variants and sizes.
 export function Button({
   asChild = false,
   className,

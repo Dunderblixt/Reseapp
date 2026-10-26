@@ -7,6 +7,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
+// koder från meteo 
 const weatherDescriptions: Record<number, string> = {
   0: "Clear sky",
   1: "Mostly clear",
@@ -38,6 +39,7 @@ const weatherDescriptions: Record<number, string> = {
   99: "Thunderstorm with heavy hail",
 };
 
+// Returns current weather for a country's capital.
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ code: string }> },

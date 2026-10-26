@@ -5,6 +5,7 @@ import { useAppContext } from "@/context/app-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// Heart button that saves or removes a country.
 export function SaveCountryButton({
   code,
   name,

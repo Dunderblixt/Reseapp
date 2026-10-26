@@ -67,6 +67,7 @@ interface RestCountriesResponse {
   errors?: { message?: string }[];
 }
 
+// Maps REST Countries errors to readable messages.
 function getRestCountriesErrorMessage(
   status: number,
   apiMessage?: string,
@@ -98,6 +99,7 @@ function getRestCountriesErrorMessage(
   return apiMessage ?? `Could not fetch countries (HTTP ${status}).`;
 }
 
+// Reads the REST Countries API key from the environment.
 function getApiKey() {
   const apiKey = process.env.REST_COUNTRIES_API_KEY;
   if (!apiKey) {
@@ -108,6 +110,7 @@ function getApiKey() {
   return apiKey;
 }
 
+// Fetches one page of countries from the API.
 async function fetchCountryPage(apiKey: string, offset: number) {
   const url = new URL("https://api.restcountries.com/countries/v5");
   url.searchParams.set("limit", String(PAGE_SIZE));
@@ -146,6 +149,7 @@ async function fetchCountryPage(apiKey: string, offset: number) {
   return { records, total: result.data?.meta?.total };
 }
 
+// Normalizes the API's language data.
 function asLanguageRecord(entries: RestCountryRecord["languages"]) {
   if (!entries) return {};
   if (!Array.isArray(entries)) return entries;
@@ -159,6 +163,7 @@ function asLanguageRecord(entries: RestCountryRecord["languages"]) {
   );
 }
 
+// Normalizes the API's native names.
 function toNativeNames(
   native: Record<string, { common?: string; official?: string }> | undefined,
 ): Record<string, { common: string; official?: string }> | undefined {
@@ -176,6 +181,7 @@ function toNativeNames(
   return Object.keys(result).length > 0 ? result : undefined;
 }
 
+// Maps a REST Countries record to a Country.
 function toCountry(record: RestCountryRecord): Country {
   const commonName = record.names?.common;
   const code =
@@ -235,6 +241,7 @@ function toCountry(record: RestCountryRecord): Country {
   };
 }
 
+// Fetches and sorts all countries.
 export async function getCountries(): Promise<Country[]> {
   const apiKey = getApiKey();
   const firstPage = await fetchCountryPage(apiKey, 0);
@@ -261,6 +268,7 @@ export async function getCountries(): Promise<Country[]> {
   );
 }
 
+// Finds one country by its code.
 export async function getCountry(code: string): Promise<Country | undefined> {
   const countries = await getCountries();
   return countries.find(

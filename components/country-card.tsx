@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { CountryFlag } from "@/components/country-flag";
 import { cn } from "@/lib/utils";
 
+// Formats the population with thousands separators.
 function formatPopulation(population: number) {
   return new Intl.NumberFormat("en").format(population);
 }
 
+// Country card with flag, facts, and save toggle.
 export function CountryCard({
   country,
   listingQuery = "",
