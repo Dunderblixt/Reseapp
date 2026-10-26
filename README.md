@@ -2,7 +2,6 @@
 
 Nordtravel är en webbapp för reseupptäckter som låter dig utforska länder runt om i världen. Bläddra bland och sök i en lista med 250+ länder, öppna en landssida för fakta, namn på lokala språk och officiella namn, en Wikipedia-sammanfattning och aktuellt väder – och spara sedan länder som favoriter och jämför två av dem sida vid sida.
 
-![Skiss av Nordtravels resesida](./docs/reseapp-skiss.jpg)
 
 ## Funktioner
 
