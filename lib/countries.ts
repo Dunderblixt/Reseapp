@@ -249,13 +249,16 @@ export async function getCountries(): Promise<Country[]> {
   if (typeof total !== "number" || total < firstPage.records.length) {
     throw new Error("Rest Countries returned an invalid number of countries.");
   }
+  // If the first page contains all countries, return it.
   const offsets = Array.from(
     { length: Math.ceil(total / PAGE_SIZE) - 1 },
     (_, index) => (index + 1) * PAGE_SIZE,
   );
+  // Fetch remaining pages in parallel.
   const remainingPages = await Promise.all(
     offsets.map((offset) => fetchCountryPage(apiKey, offset)),
   );
+  // Combine all pages and validate the total count.
   const records = [firstPage.records, ...remainingPages.map((page) => page.records)].flat();
   if (records.length !== total) {
     throw new Error(
