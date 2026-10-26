@@ -31,7 +31,7 @@ function numericWinner(a?: number, b?: number): "a" | "b" | null {
 
 function HighestBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950 px-2 py-0.5 text-[11px] font-semibold text-[#e9f15b]">
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950 px-1.5 py-0.5 text-[10px] font-semibold text-[#e9f15b] sm:px-2 sm:text-[11px]">
       <TrendingUp aria-hidden="true" size={12} />
       Highest
     </span>
@@ -48,16 +48,20 @@ function ValueCell({
   highest?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
       <span
         className={cn(
-          "font-display text-lg font-semibold",
+          "break-words font-display text-sm font-semibold sm:text-lg",
           highest ? "text-emerald-950" : "text-stone-800",
         )}
       >
         {value}
       </span>
-      {note && <span className="text-sm text-stone-600">{note}</span>}
+      {note && (
+        <span className="break-words text-xs text-stone-600 sm:text-sm">
+          {note}
+        </span>
+      )}
       {highest && <HighestBadge />}
     </div>
   );
@@ -72,7 +76,7 @@ function WeatherValue({
 }) {
   if (query.isPending) {
     return (
-      <span className="flex items-center gap-2 text-sm text-stone-500" role="status">
+      <span className="flex items-center gap-2 text-xs text-stone-500 sm:text-sm" role="status">
         <LoaderCircle aria-hidden="true" className="animate-spin" size={15} />
         Loading...
       </span>
@@ -80,7 +84,7 @@ function WeatherValue({
   }
 
   if (query.error || !query.data) {
-    return <span className="text-sm text-stone-500">Unavailable</span>;
+    return <span className="text-xs text-stone-500 sm:text-sm">Unavailable</span>;
   }
 
   return (
@@ -279,27 +283,32 @@ export function CompareView({
         </label>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-stone-200 bg-white">
-        <table className="w-full min-w-[560px] border-collapse text-left">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+        <table className="w-full table-fixed border-collapse text-left">
           <caption className="sr-only">
             Comparison of {countryA.name.common} and {countryB.name.common}
           </caption>
+          <colgroup>
+            <col className="w-[32%]" />
+            <col className="w-[34%]" />
+            <col className="w-[34%]" />
+          </colgroup>
           <thead>
             <tr className="border-b border-stone-200">
               <th
-                className="p-4 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500"
+                className="px-2 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 sm:p-4 sm:text-xs sm:tracking-[0.14em]"
                 scope="col"
               >
                 Metric
               </th>
               <th
-                className="p-4 font-display text-lg font-semibold text-emerald-950"
+                className="break-words px-2 py-2.5 font-display text-xs font-semibold text-emerald-950 sm:p-4 sm:text-lg"
                 scope="col"
               >
                 {countryA.name.common}
               </th>
               <th
-                className="p-4 font-display text-lg font-semibold text-emerald-950"
+                className="break-words px-2 py-2.5 font-display text-xs font-semibold text-emerald-950 sm:p-4 sm:text-lg"
                 scope="col"
               >
                 {countryB.name.common}
@@ -309,18 +318,18 @@ export function CompareView({
           <tbody>
             <tr className="border-b border-stone-100">
               <th
-                className="p-4 text-sm font-medium text-stone-500"
+                className="px-2 py-2.5 text-xs font-medium text-stone-500 sm:p-4 sm:text-sm"
                 scope="row"
               >
                 Population
               </th>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <ValueCell
                   highest={populationWinner === "a"}
                   value={formatNumber(countryA.population)}
                 />
               </td>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <ValueCell
                   highest={populationWinner === "b"}
                   value={formatNumber(countryB.population)}
@@ -329,18 +338,18 @@ export function CompareView({
             </tr>
             <tr className="border-b border-stone-100">
               <th
-                className="p-4 text-sm font-medium text-stone-500"
+                className="px-2 py-2.5 text-xs font-medium text-stone-500 sm:p-4 sm:text-sm"
                 scope="row"
               >
                 Area
               </th>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <ValueCell
                   highest={areaWinner === "a"}
                   value={formatArea(countryA.area)}
                 />
               </td>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <ValueCell
                   highest={areaWinner === "b"}
                   value={formatArea(countryB.area)}
@@ -349,18 +358,18 @@ export function CompareView({
             </tr>
             <tr>
               <th
-                className="p-4 text-sm font-medium text-stone-500"
+                className="px-2 py-2.5 text-xs font-medium text-stone-500 sm:p-4 sm:text-sm"
                 scope="row"
               >
                 Current weather
               </th>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <WeatherValue
                   highest={temperatureWinner === "a"}
                   query={weatherA}
                 />
               </td>
-              <td className="p-4">
+              <td className="px-2 py-2.5 sm:p-4">
                 <WeatherValue
                   highest={temperatureWinner === "b"}
                   query={weatherB}
