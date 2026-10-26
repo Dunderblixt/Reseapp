@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
 import { z } from "zod";
 import { useCountrySearch } from "@/hooks/use-country-search";
 import { useCountries } from "@/hooks/use-countries";
 import { CountryCard } from "@/components/country-card";
 import { Button } from "@/components/ui/button";
+import type { Country } from "@/lib/countries";
 
 const searchSchema = z.object({
   query: z.string().max(80, "Search must be 80 characters or fewer."),
@@ -18,8 +19,49 @@ type SearchValues = z.infer<typeof searchSchema>;
 const PAGE_SIZE = 9;
 const ALL_REGIONS = "All regions";
 
+const SORT_FIELDS = ["name", "population", "area"] as const;
+type SortField = (typeof SORT_FIELDS)[number];
+type SortDirection = "asc" | "desc";
+const DEFAULT_SORT: SortField = "name";
+const DEFAULT_DIRECTION: SortDirection = "asc";
+
+function isSortField(value: string | null): value is SortField {
+  return value !== null && (SORT_FIELDS as readonly string[]).includes(value);
+}
+
+function isSortDirection(value: string | null): value is SortDirection {
+  return value === "asc" || value === "desc";
+}
+
+function sortCountries(
+  list: Country[],
+  field: SortField,
+  direction: SortDirection,
+): Country[] {
+  const factor = direction === "asc" ? 1 : -1;
+
+  return [...list].sort((a, b) => {
+    if (field === "population") {
+      return (a.population - b.population) * factor;
+    }
+
+    if (field === "area") {
+      const areaA = a.area;
+      const areaB = b.area;
+      if (typeof areaA !== "number" && typeof areaB !== "number") return 0;
+      if (typeof areaA !== "number") return 1;
+      if (typeof areaB !== "number") return -1;
+      return (areaA - areaB) * factor;
+    }
+
+    return a.name.common.localeCompare(b.name.common, "en") * factor;
+  });
+}
+
 export function CountryExplorer() {
   const [region, setRegion] = useState(ALL_REGIONS);
+  const [sort, setSort] = useState<SortField>(DEFAULT_SORT);
+  const [direction, setDirection] = useState<SortDirection>(DEFAULT_DIRECTION);
   const [page, setPage] = useState(1);
   const [urlReady, setUrlReady] = useState(false);
   const {
@@ -39,12 +81,18 @@ export function CountryExplorer() {
     mode: "onChange",
   });
   const query = watch("query");
-  const filtered = useCountrySearch(countries, query, region);
+  const searched = useCountrySearch(countries, query, region);
+  const filtered = useMemo(
+    () => sortCountries(searched, sort, direction),
+    [searched, sort, direction],
+  );
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageCountries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const listingParams = new URLSearchParams();
   if (query) listingParams.set("q", query);
   if (region !== ALL_REGIONS) listingParams.set("region", region);
+  if (sort !== DEFAULT_SORT) listingParams.set("sort", sort);
+  if (direction !== DEFAULT_DIRECTION) listingParams.set("dir", direction);
   if (page > 1) listingParams.set("page", String(page));
   const listingQuery = listingParams.toString();
   const regions = [
@@ -60,6 +108,13 @@ export function CountryExplorer() {
 
     setValue("query", params.get("q") ?? "", { shouldValidate: true });
     setRegion(params.get("region") || ALL_REGIONS);
+
+    const initialSort = params.get("sort");
+    if (isSortField(initialSort)) setSort(initialSort);
+
+    const initialDirection = params.get("dir");
+    if (isSortDirection(initialDirection)) setDirection(initialDirection);
+
     setPage(
       Number.isSafeInteger(initialPage) && initialPage > 0 ? initialPage : 1,
     );
@@ -72,10 +127,14 @@ export function CountryExplorer() {
     const params = new URLSearchParams(window.location.search);
     params.delete("q");
     params.delete("region");
+    params.delete("sort");
+    params.delete("dir");
     params.delete("page");
 
     if (query) params.set("q", query);
     if (region !== ALL_REGIONS) params.set("region", region);
+    if (sort !== DEFAULT_SORT) params.set("sort", sort);
+    if (direction !== DEFAULT_DIRECTION) params.set("dir", direction);
     if (page > 1) params.set("page", String(page));
 
     const search = params.toString();
@@ -85,7 +144,7 @@ export function CountryExplorer() {
     if (nextUrl !== currentUrl) {
       window.history.replaceState(window.history.state, "", nextUrl);
     }
-  }, [page, query, region, urlReady]);
+  }, [direction, page, query, region, sort, urlReady]);
 
   useEffect(() => {
     if (!urlReady || isPending || error) return;
@@ -127,7 +186,7 @@ export function CountryExplorer() {
         </p>}
       </div>
 
-      <div className="mb-7 flex flex-col gap-3 rounded-2xl border border-stone-200/80 bg-white p-3 sm:flex-row sm:items-center">
+      <div className="mb-7 flex flex-col gap-3 rounded-2xl border border-stone-200/80 bg-white p-3 sm:flex-row sm:flex-wrap sm:items-center">
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">Search country or capital</span>
           <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
@@ -153,6 +212,40 @@ export function CountryExplorer() {
             {regions.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </div>
+        <div className="relative flex items-center">
+          <ArrowUpDown aria-hidden="true" className="pointer-events-none absolute left-3.5 text-emerald-800" size={16} />
+          <label className="sr-only" htmlFor="sort-field">Sort by</label>
+          <select
+            className="h-12 w-full appearance-none rounded-xl border border-stone-500 bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:min-w-[170px]"
+            id="sort-field"
+            onChange={(event) => {
+              setSort(event.target.value as SortField);
+              setPage(1);
+            }}
+            value={sort}
+          >
+            <option value="name">Name</option>
+            <option value="population">Population</option>
+            <option value="area">Area</option>
+          </select>
+        </div>
+        <Button
+          aria-label={direction === "asc" ? "Sort descending" : "Sort ascending"}
+          className="h-12 shrink-0"
+          onClick={() => {
+            setDirection((current) => (current === "asc" ? "desc" : "asc"));
+            setPage(1);
+          }}
+          size="sm"
+          variant="outline"
+        >
+          {direction === "asc" ? (
+            <ArrowUp aria-hidden="true" size={16} />
+          ) : (
+            <ArrowDown aria-hidden="true" size={16} />
+          )}
+          {direction === "asc" ? "Asc" : "Desc"}
+        </Button>
       </div>
       {errors.query && <p className="-mt-4 mb-4 text-sm text-red-700" role="alert">{errors.query.message}</p>}
 

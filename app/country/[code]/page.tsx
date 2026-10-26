@@ -155,6 +155,8 @@ function formatNumber(value: number) {
 function getListingQuery(searchParams: {
   q?: string | string[];
   region?: string | string[];
+  sort?: string | string[];
+  dir?: string | string[];
   page?: string | string[];
 }) {
   const params = new URLSearchParams();
@@ -162,12 +164,22 @@ function getListingQuery(searchParams: {
   const region = Array.isArray(searchParams.region)
     ? searchParams.region[0]
     : searchParams.region;
+  const sort = Array.isArray(searchParams.sort)
+    ? searchParams.sort[0]
+    : searchParams.sort;
+  const dir = Array.isArray(searchParams.dir)
+    ? searchParams.dir[0]
+    : searchParams.dir;
   const page = Array.isArray(searchParams.page)
     ? searchParams.page[0]
     : searchParams.page;
 
   if (query && query.length <= 80) params.set("q", query);
   if (region) params.set("region", region);
+  if (sort === "name" || sort === "population" || sort === "area") {
+    params.set("sort", sort);
+  }
+  if (dir === "asc" || dir === "desc") params.set("dir", dir);
   if (page && /^[1-9]\d*$/.test(page)) params.set("page", page);
 
   return params.toString();
@@ -181,6 +193,8 @@ export default async function CountryPage({
   searchParams: Promise<{
     q?: string | string[];
     region?: string | string[];
+    sort?: string | string[];
+    dir?: string | string[];
     page?: string | string[];
   }>;
 }) {
