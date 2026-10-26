@@ -22,6 +22,17 @@ export interface Country {
 
 const PAGE_SIZE = 100;
 
+const FALLBACK_FLAG_URLS: Record<string, string> = {
+  abkhazia:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Abkhazia.svg?width=160",
+  "northern-cyprus":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_the_Turkish_Republic_of_Northern_Cyprus.svg?width=160",
+  somaliland:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Somaliland.svg?width=160",
+  "south-ossetia":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_South_Ossetia.svg?width=160",
+};
+
 interface RestCountryRecord {
   names?: {
     common?: string;
@@ -186,6 +197,7 @@ function toCountry(record: RestCountryRecord): Country {
     ?.filter((currency) => currency.code && currency.name)
     .map((currency) => [currency.code!, { name: currency.name!, symbol: currency.symbol }]);
   const currencyRecord = Object.fromEntries(currencies ?? []);
+  const fallbackFlag = FALLBACK_FLAG_URLS[code];
 
   return {
     cca3: code,
@@ -204,7 +216,7 @@ function toCountry(record: RestCountryRecord): Country {
     flag: record.flag?.emoji || "🏳️",
     flags: {
       svg: record.flag?.url_svg || undefined,
-      png: record.flag?.url_png || undefined,
+      png: record.flag?.url_png || fallbackFlag || undefined,
       alt: record.flag?.description || undefined,
     },
     capitalInfo:
