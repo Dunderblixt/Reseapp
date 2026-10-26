@@ -39,7 +39,7 @@ export function CountryCard({
           type="button"
           variant="ghost"
         >
-          <Heart size={19} fill={saved ? "currentColor" : "none"} />
+          <Heart aria-hidden="true" size={19} fill={saved ? "currentColor" : "none"} />
         </Button>
         <Link
           className="relative flex min-h-[120px] flex-col justify-between text-inherit no-underline"
@@ -49,7 +49,7 @@ export function CountryCard({
           <CountryFlag className="size-10" country={country} />
           <div className="relative flex items-end justify-between gap-3">
             <div>
-              <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-900/70">
+              <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-900">
                 Region: {country.region}
               </p>
               <h2 className="font-display text-[23px] font-semibold leading-tight tracking-tight text-emerald-950">
@@ -57,7 +57,7 @@ export function CountryCard({
               </h2>
             </div>
             <span className="mb-1 flex size-8 shrink-0 items-center justify-center rounded-full border border-emerald-950/15 bg-white/60 text-emerald-950 transition group-hover:bg-emerald-950 group-hover:text-white">
-              <ArrowUpRight size={17} />
+              <ArrowUpRight aria-hidden="true" size={17} />
             </span>
           </div>
         </Link>

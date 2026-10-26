@@ -26,7 +26,7 @@ export function WeatherPanel({ code }: { code: string }) {
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">Current weather</p>
         <p className="mt-3 text-sm text-stone-600">{error?.message ?? "Could not load the weather."}</p>
         <Button className="mt-4" onClick={() => void refetch()} size="sm" variant="outline">
-          <RefreshCw size={14} /> Try again
+          <RefreshCw aria-hidden="true" size={14} /> Try again
         </Button>
       </section>
     );
@@ -48,8 +48,8 @@ export function WeatherPanel({ code }: { code: string }) {
         <MapPin aria-hidden="true" className="text-emerald-700" size={15} /> {data.city}
       </p>
       <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-stone-500">
-        <span className="flex items-center gap-1.5"><Droplets size={14} /> Current conditions</span>
-        <span className="flex items-center justify-end gap-1.5"><Wind size={14} /> Live weather</span>
+        <span className="flex items-center gap-1.5"><Droplets aria-hidden="true" size={14} /> Current conditions</span>
+        <span className="flex items-center justify-end gap-1.5"><Wind aria-hidden="true" size={14} /> Live weather</span>
       </div>
     </section>
   );

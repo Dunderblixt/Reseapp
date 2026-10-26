@@ -133,7 +133,7 @@ export function CountryExplorer() {
           <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
           <input
             {...register("query", { onChange: () => setPage(1) })}
-            className="h-12 w-full rounded-xl border border-transparent bg-stone-50 pl-11 pr-4 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
+            className="h-12 w-full rounded-xl border border-stone-500 bg-stone-50 pl-11 pr-4 text-sm text-stone-800 outline-none transition placeholder:text-stone-600 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
             placeholder="Search by country or capital..."
             type="search"
           />
@@ -142,7 +142,7 @@ export function CountryExplorer() {
           <SlidersHorizontal aria-hidden="true" className="pointer-events-none absolute left-3.5 text-emerald-800" size={16} />
           <label className="sr-only" htmlFor="region-filter">Filter by region</label>
           <select
-            className="h-12 w-full appearance-none rounded-xl border border-transparent bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:min-w-[190px]"
+            className="h-12 w-full appearance-none rounded-xl border border-stone-500 bg-stone-50 pl-10 pr-10 text-sm font-medium text-stone-700 outline-none transition focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/10 focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 sm:min-w-[190px]"
             id="region-filter"
             onChange={(event) => {
               setRegion(event.target.value);
@@ -203,7 +203,7 @@ export function CountryExplorer() {
             size="sm"
             variant="outline"
           >
-            <ChevronLeft size={16} /> Previous
+            <ChevronLeft aria-hidden="true" size={16} /> Previous
           </Button>
           <span className="min-w-24 text-center text-sm tabular-nums text-stone-600" aria-live="polite">
             Page {page} of {pageCount}
@@ -215,7 +215,7 @@ export function CountryExplorer() {
             size="sm"
             variant="outline"
           >
-            Next <ChevronRight size={16} />
+            Next <ChevronRight aria-hidden="true" size={16} />
           </Button>
         </nav>
       )}

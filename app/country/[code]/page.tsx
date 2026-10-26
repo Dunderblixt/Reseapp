@@ -205,7 +205,7 @@ export default async function CountryPage({
     <main className="min-h-[70vh] bg-[#faf9f5]">
       <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-10">
         <Button asChild className="mb-7" size="sm" variant="ghost">
-          <Link href={returnHref}><ArrowLeft size={16} /> Back to all countries</Link>
+          <Link href={returnHref}><ArrowLeft aria-hidden="true" size={16} /> Back to all countries</Link>
         </Button>
 
         <section className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
@@ -225,7 +225,7 @@ export default async function CountryPage({
               </Suspense>
               <div className="relative z-10">
                 <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/75">
-                  <MapPin size={13} /> {country.region}{country.subregion ? ` · ${country.subregion}` : ""}
+                  <MapPin aria-hidden="true" size={13} /> {country.region}{country.subregion ? ` · ${country.subregion}` : ""}
                 </p>
                 <div className="flex items-end gap-3">
                   <CountryFlag className="size-10" country={country} />
@@ -262,19 +262,19 @@ export default async function CountryPage({
               </h2>
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><MapPin size={15} /> Capital</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><MapPin aria-hidden="true" size={15} /> Capital</dt>
                   <dd className="mt-3 font-display text-xl font-semibold text-emerald-950">{country.capital?.[0] ?? "Not available"}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Users size={15} /> Population</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Users aria-hidden="true" size={15} /> Population</dt>
                   <dd className="mt-3 font-display text-xl font-semibold text-emerald-950">{formatNumber(country.population)}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Languages size={15} /> Languages</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Languages aria-hidden="true" size={15} /> Languages</dt>
                   <dd className="mt-3 font-display text-lg font-semibold text-emerald-950">{languages.slice(0, 3).join(", ") || "Not available"}</dd>
                 </div>
                 <div className="rounded-2xl border border-stone-200/80 bg-white p-5">
-                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Clock3 size={15} /> Currency</dt>
+                  <dt className="flex items-center gap-2 text-xs font-medium text-stone-500"><Clock3 aria-hidden="true" size={15} /> Currency</dt>
                   <dd className="mt-3 font-display text-lg font-semibold text-emerald-950">
                     {currency ? `${currency.name}${currency.symbol ? ` (${currency.symbol})` : ""}` : "Not available"}
                   </dd>
