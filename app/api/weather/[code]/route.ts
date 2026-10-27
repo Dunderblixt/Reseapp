@@ -88,6 +88,8 @@ export async function GET(
     temperature: currentWeather.temperature_2m,
     description: weatherDescriptions[currentWeather.weather_code] ?? "Unknown weather",
     icon: "",
+    humidity: currentWeather.relative_humidity_2m,
+    windSpeed: currentWeather.wind_speed_10m,
     city: country.capital?.[0] ?? country.name.common,
   });
 }

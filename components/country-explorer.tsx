@@ -105,7 +105,7 @@ export function CountryExplorer() {
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b, "en")),
   ];
-
+// Initializes the search, filter, sort, and pagination state from the URL on first render.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const initialPage = Number(params.get("page"));
@@ -124,7 +124,7 @@ export function CountryExplorer() {
     );
     setUrlReady(true);
   }, [setValue]);
-
+// Updates the URL with the current search, filter, sort, and pagination state.
   useEffect(() => {
     if (!urlReady) return;
 
@@ -149,7 +149,7 @@ export function CountryExplorer() {
       window.history.replaceState(window.history.state, "", nextUrl);
     }
   }, [direction, page, query, region, sort, urlReady]);
-
+// Validates the current page and region when countries or URL state changes.
   useEffect(() => {
     if (!urlReady || isPending || error) return;
 

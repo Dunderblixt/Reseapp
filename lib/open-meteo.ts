@@ -1,6 +1,8 @@
 export interface OpenMeteoCurrentWeather {
   temperature_2m: number;
   weather_code: number;
+  relative_humidity_2m?: number;
+  wind_speed_10m?: number;
 }
 
 interface OpenMeteoForecastResponse {
@@ -18,9 +20,15 @@ function isForecastResponse(
 ): value is OpenMeteoForecastResponse {
   if (!isRecord(value) || !isRecord(value.current)) return false;
 
+  const { temperature_2m, weather_code, relative_humidity_2m, wind_speed_10m } =
+    value.current;
+
   return (
-    typeof value.current.temperature_2m === "number" &&
-    typeof value.current.weather_code === "number"
+    typeof temperature_2m === "number" &&
+    typeof weather_code === "number" &&
+    (relative_humidity_2m === undefined ||
+      typeof relative_humidity_2m === "number") &&
+    (wind_speed_10m === undefined || typeof wind_speed_10m === "number")
   );
 }
 
@@ -32,7 +40,10 @@ export async function fetchOpenMeteoCurrentWeather(
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", String(latitude));
   url.searchParams.set("longitude", String(longitude));
-  url.searchParams.set("current", "temperature_2m,weather_code");
+  url.searchParams.set(
+    "current",
+    "temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m",
+  );
 
   let response: Response;
   try {

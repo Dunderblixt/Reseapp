@@ -2,6 +2,8 @@ export interface Weather {
   temperature: number;
   description: string;
   icon: string;
+  humidity?: number;
+  windSpeed?: number;
   city: string;
 }
 
@@ -34,7 +36,9 @@ function isWeather(value: unknown): value is Weather {
     typeof value.temperature === "number" &&
     typeof value.description === "string" &&
     typeof value.icon === "string" &&
-    typeof value.city === "string"
+    typeof value.city === "string" &&
+    (value.humidity === undefined || typeof value.humidity === "number") &&
+    (value.windSpeed === undefined || typeof value.windSpeed === "number")
   );
 }
 
