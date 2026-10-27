@@ -22,7 +22,7 @@ export function SiteHeader() {
         <nav aria-label="Main navigation" className="flex items-center gap-7">
           <Link
             className="text-sm font-medium text-stone-700 transition hover:text-emerald-900"
-            href="/"
+              href="/#countries"
           >
             Discover
           </Link>
