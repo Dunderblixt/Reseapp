@@ -27,12 +27,6 @@ export function SiteHeader() {
             Discover
           </Link>
           <FavouritesNavLink />
-          <a
-            className="hidden text-sm font-medium text-stone-700 transition hover:text-emerald-900 sm:inline"
-            href="#om-nordtravel"
-          >
-            About Nordtravel
-          </a>
           <span className="hidden rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-600 md:inline">
             Your next journey starts here
           </span>
