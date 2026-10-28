@@ -10,6 +10,7 @@ import { useCountries } from "@/hooks/use-countries";
 import { CountryCard } from "@/components/country-card";
 import { Button } from "@/components/ui/button";
 import type { Country } from "@/lib/countries";
+import { saveExplorerQuery } from "@/lib/explorer-query";
 
 const searchSchema = z.object({
   query: z.string().max(80, "Search must be 80 characters or fewer."),
@@ -128,6 +129,8 @@ export function CountryExplorer() {
   useEffect(() => {
     if (!urlReady) return;
 
+    saveExplorerQuery(listingQuery);
+
     const params = new URLSearchParams(window.location.search);
     params.delete("q");
     params.delete("region");
@@ -148,7 +151,7 @@ export function CountryExplorer() {
     if (nextUrl !== currentUrl) {
       window.history.replaceState(window.history.state, "", nextUrl);
     }
-  }, [direction, page, query, region, sort, urlReady]);
+  }, [direction, listingQuery, page, query, region, sort, urlReady]);
 // Validates the current page and region when countries or URL state changes.
   useEffect(() => {
     if (!urlReady || isPending || error) return;

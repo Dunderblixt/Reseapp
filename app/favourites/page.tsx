@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { FavouritesView } from "@/components/favourites-view";
 import { CompareView } from "@/components/compare-view";
+import { ExplorerLink } from "@/components/explorer-link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -25,9 +25,9 @@ export default async function FavouritesPage({
     <main className="min-h-[70vh] bg-[#faf9f5]">
       <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-10">
         <Button asChild className="mb-7" size="sm" variant="ghost">
-          <Link href="/">
+          <ExplorerLink>
             <ArrowLeft aria-hidden="true" size={16} /> Back to all countries
-          </Link>
+          </ExplorerLink>
         </Button>
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">
           Your collection
