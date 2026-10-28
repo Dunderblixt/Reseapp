@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { AlertCircle, Heart, LoaderCircle } from "lucide-react";
 import { useAppContext } from "@/context/app-context";
 import { useCountries } from "@/hooks/use-countries";
 import { CountryCard } from "@/components/country-card";
+import { ExplorerLink } from "@/components/explorer-link";
 import { Button } from "@/components/ui/button";
 
 // Lists the user's saved countries.
@@ -37,7 +37,7 @@ export function FavouritesView() {
           your next adventure.
         </p>
         <Button asChild className="mt-6">
-          <Link href="/">Explore countries</Link>
+          <ExplorerLink>Explore countries</ExplorerLink>
         </Button>
       </div>
     );

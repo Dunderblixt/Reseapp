@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Compass } from "lucide-react";
+import { ExplorerLink } from "@/components/explorer-link";
 import { FavouritesNavLink } from "@/components/favourites-nav-link";
 
 // Site header with logo and navigation.
@@ -25,12 +26,12 @@ export function SiteHeader() {
           </span>
         </div>
         <nav aria-label="Main navigation" className="flex items-center gap-7">
-          <Link
+          <ExplorerLink
             className="text-sm font-medium text-stone-700 transition hover:text-emerald-900"
-            href="/#countries"
+            hash="countries"
           >
             Discover
-          </Link>
+          </ExplorerLink>
           <FavouritesNavLink />
         </nav>
       </div>
